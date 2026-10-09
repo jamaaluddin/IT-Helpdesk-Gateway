@@ -460,17 +460,27 @@
                                 </td>
 
                                 <td>
-                                    <span class="badge priority-{{ $ticket->priority }}">
-                                        @if ($ticket->priority === 'low')
+                                    @if ($ticket->priority === 'low')
+                                        <span class="badge priority-low">
                                             Rendah
-                                        @elseif ($ticket->priority === 'medium')
+                                        </span>
+                                    @elseif ($ticket->priority === 'medium')
+                                        <span class="badge priority-medium">
                                             Sedang
-                                        @elseif ($ticket->priority === 'high')
+                                        </span>
+                                    @elseif ($ticket->priority === 'high')
+                                        <span class="badge priority-high">
                                             Tinggi
-                                        @elseif ($ticket->priority === 'critical')
+                                        </span>
+                                    @elseif ($ticket->priority === 'critical')
+                                        <span class="badge priority-critical">
                                             Kritis
-                                        @endif
-                                    </span>
+                                        </span>
+                                    @else
+                                        <span class="badge" style="background:#f3f4f6; color:#6b7280;">
+                                            Belum Ditentukan
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <td>

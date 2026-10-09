@@ -1145,28 +1145,73 @@
 
             </div>
 
+            <div class="info-box">
+
+                <div class="label">
+                    Cabang
+            </div>
+
+            <div class="value">
+                   {{ $ticket->office->name ?? '-' }}
+            </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+            <div class="label">
+                   Departemen
+            </div>
+
+            <div class="value">
+                  {{ $ticket->department->name ?? '-' }}
+            </div>
+
+            </div>
 
             <div class="info-box">
 
                 <div class="label">
-                    Prioritas
+                        Prioritas
                 </div>
 
                 <div class="value">
 
-                    <span class="badge priority-{{ $ticket->priority }}">
+                    @if ($ticket->priority === 'low')
 
-                        @if ($ticket->priority === 'low')
-                            Rendah
-                        @elseif ($ticket->priority === 'medium')
-                            Sedang
-                        @elseif ($ticket->priority === 'high')
-                            Tinggi
-                        @elseif ($ticket->priority === 'critical')
-                            Kritis
-                        @endif
+                        <span class="badge priority-low">
+                                Rendah
+                        </span>
 
-                    </span>
+                    @elseif ($ticket->priority === 'medium')
+
+                        <span class="badge priority-medium">
+                               Sedang
+                        </span>
+
+                    @elseif ($ticket->priority === 'high')
+
+                        <span class="badge priority-high">
+                               Tinggi
+                        </span>
+
+                    @elseif ($ticket->priority === 'critical')
+
+                        <span class="badge priority-critical">
+                               Kritis
+                        </span>
+
+                    @else
+
+                        <span
+                             class="badge"
+                             style="background:#f3f4f6; color:#6b7280;"
+                        >
+                            Belum Ditentukan
+                        </span>
+
+                    @endif
 
                 </div>
 

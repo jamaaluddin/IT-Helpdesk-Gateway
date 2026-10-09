@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,12 +21,141 @@
         }
 
         /* =========================================
+           SIDEBAR
+        ========================================= */
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #4c1d95;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 24px 18px;
+            color: white;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding: 0 5px;
+        }
+
+        .sidebar-brand img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .sidebar-brand-text h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-brand-text p {
+            font-size: 12px;
+            color: #ddd6fe;
+        }
+
+        .menu-title {
+            font-size: 11px;
+            color: #c4b5fd;
+            font-weight: bold;
+            margin: 20px 10px 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: #ede9fe;
+            text-decoration: none;
+            padding: 11px 12px;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .menu-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-logout {
+            margin-top: 28px;
+            padding-bottom: 10px;
+        }
+
+        .sidebar-logout form {
+            width: 100%;
+        }
+
+        .sidebar-logout button {
+            width: 100%;
+            border: none;
+            background: #7c3aed;
+            color: white;
+            padding: 11px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                box-shadow 0.2s ease;
+
+            box-shadow:
+                0 4px 10px rgba(124, 58, 237, 0.25);
+        }
+
+        .sidebar-logout button:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+
+        /* =========================================
+           MAIN
+        ========================================= */
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+
+        /* =========================================
            HEADER
         ========================================= */
 
         .header {
             background: white;
-            padding: 20px 35px;
+            padding: 18px 30px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -37,77 +167,56 @@
                 0 8px 20px rgba(0, 0, 0, 0.06),
                 0 18px 40px rgba(124, 58, 237, 0.07);
 
-            position: relative;
-            z-index: 10;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .header-title h1 {
+            font-size: 22px;
+            color: #172033;
+            margin-bottom: 4px;
         }
 
-        .brand img {
-            width: 120px;
-            height: auto;
-            display: block;
-
-            filter: drop-shadow(
-                0 4px 6px rgba(0, 0, 0, 0.10)
-            );
-        }
-
-        .brand h1 {
-            font-size: 23px;
-            color: #1f2937;
-        }
-
-        .brand p {
-            margin-top: 5px;
+        .header-title p {
             font-size: 13px;
             color: #6b7280;
         }
 
         .user-info {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #7c3aed;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: bold;
+        }
+
+        .user-text {
             text-align: right;
+        }
+
+        .user-text strong {
+            display: block;
             font-size: 14px;
-            font-weight: 600;
         }
 
         .role {
             color: #7c3aed;
             font-size: 12px;
-            margin-top: 4px;
+            margin-top: 3px;
             font-weight: bold;
-        }
-
-        .logout-btn {
-            margin-top: 8px;
-            background: #7c3aed;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease,
-                background 0.2s ease;
-
-            box-shadow:
-                0 3px 7px rgba(124, 58, 237, 0.20),
-                0 8px 18px rgba(124, 58, 237, 0.12);
-        }
-
-        .logout-btn:hover {
-            background: #6d28d9;
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 6px 12px rgba(124, 58, 237, 0.25),
-                0 13px 25px rgba(124, 58, 237, 0.16);
         }
 
 
@@ -116,9 +225,9 @@
         ========================================= */
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: auto;
-            padding: 35px;
+            padding: 30px;
         }
 
 
@@ -150,7 +259,7 @@
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 20px;
-            margin-bottom: 32px;
+            margin-bottom: 30px;
             align-items: stretch;
         }
 
@@ -166,6 +275,9 @@
 
             display: flex;
             flex-direction: column;
+
+            text-decoration: none;
+            color: inherit;
 
             box-shadow:
                 0 3px 7px rgba(0, 0, 0, 0.03),
@@ -191,10 +303,6 @@
         .stat-card .icon {
             font-size: 25px;
             margin-bottom: 13px;
-
-            filter: drop-shadow(
-                0 3px 4px rgba(0, 0, 0, 0.08)
-            );
         }
 
         .stat-card .label {
@@ -207,36 +315,30 @@
             font-size: 29px;
             font-weight: bold;
             color: #111827;
-
             margin-top: auto;
-
-            text-shadow:
-                0 1px 2px rgba(0, 0, 0, 0.06);
         }
 
 
         /* =========================================
-           ACTION CARDS
+           BOTTOM CARDS
         ========================================= */
 
-        .action-section {
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 28px;
-            margin-bottom: 32px;
-
+            grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+            gap: 24px;
             align-items: stretch;
         }
 
-        .action-card {
+        .dashboard-card {
             background: white;
-
-            padding: 30px 34px;
 
             border-radius: 18px;
             border: 1px solid #eef2f7;
 
-            min-height: 315px;
+            padding: 25px;
+
+            height: 460px;
 
             display: flex;
             flex-direction: column;
@@ -252,330 +354,263 @@
                 box-shadow 0.25s ease;
         }
 
-        .action-card:hover {
-            transform: translateY(-5px);
+        .dashboard-card:hover {
+            transform: translateY(-3px);
 
             box-shadow:
                 0 5px 10px rgba(0, 0, 0, 0.04),
                 0 12px 25px rgba(0, 0, 0, 0.07),
                 0 22px 45px rgba(0, 0, 0, 0.08),
-                0 32px 65px rgba(124, 58, 237, 0.12);
-        }
-
-        .action-card h3 {
-            margin-bottom: 12px;
-            font-size: 20px;
-            line-height: 1.4;
-            color: #172033;
-        }
-
-        .action-card p {
-            color: #64748b;
-            font-size: 14px;
-            line-height: 1.75;
-
-            margin-bottom: 20px;
-        }
-
-        /* =========================================
-           MINI TICKET LIST DALAM CARD
-        ========================================= */
-
-        .my-ticket-list {
-            background: #f8fafc;
-            padding: 13px 15px;
-
-            border-radius: 11px;
-            border: 1px solid #eef2f7;
-
-            margin-bottom: 20px;
-
-            box-shadow:
-                inset 0 1px 3px rgba(0, 0, 0, 0.025),
-                0 3px 8px rgba(0, 0, 0, 0.025);
-        }
-
-        .my-ticket-item {
-            padding: 9px 0;
-            border-bottom: 1px solid #e5e7eb;
-
-            transition:
-                padding-left 0.2s ease,
-                background 0.2s ease;
-        }
-
-        .my-ticket-item:last-child {
-            border-bottom: none;
-        }
-
-        .my-ticket-item:hover {
-            padding-left: 5px;
-        }
-
-        .my-ticket-number {
-            font-weight: bold;
-            color: #7c3aed;
-
-            text-shadow:
-                0 1px 2px rgba(124, 58, 237, 0.10);
-        }
-
-        .my-ticket-subject {
-            font-size: 13px;
-            margin-top: 3px;
-        }
-
-        .my-ticket-status {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 3px;
-        }
-
-        .empty-my-ticket {
-            margin-bottom: 20px;
-
-            background: #f9fafb;
-            border: 1px dashed #dbe2ea;
-
-            padding: 16px;
-
-            border-radius: 10px;
-
-            color: #6b7280;
-            font-size: 13px;
-
-            box-shadow:
-                inset 0 0 18px rgba(0, 0, 0, 0.015);
+                0 32px 65px rgba(124, 58, 237, 0.10);
         }
 
 
         /* =========================================
-           BUTTON
+           CARD HEADER
         ========================================= */
 
-        .action-card > a {
-            margin-top: auto;
-            align-self: flex-start;
-        }
-
-        .btn-primary,
-        .btn-secondary {
-            display: inline-flex;
-
-            align-items: center;
-            justify-content: center;
-
-            min-width: 155px;
-            min-height: 52px;
-
-            text-decoration: none;
-
-            padding: 11px 22px;
-
-            border-radius: 11px;
-
-            font-size: 14px;
-            font-weight: bold;
-
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease,
-                background 0.2s ease;
-        }
-
-        .btn-primary {
-            background: #7c3aed;
-            color: white;
-
-            box-shadow:
-                0 4px 9px rgba(124, 58, 237, 0.22),
-                0 10px 20px rgba(124, 58, 237, 0.13);
-        }
-
-        .btn-primary:hover {
-            background: #6d28d9;
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 7px 14px rgba(124, 58, 237, 0.28),
-                0 15px 28px rgba(124, 58, 237, 0.17);
-        }
-
-        .btn-secondary {
-            background: #ede9fe;
-            color: #7c3aed;
-
-            box-shadow:
-                0 4px 8px rgba(124, 58, 237, 0.08),
-                0 9px 18px rgba(124, 58, 237, 0.06);
-        }
-
-        .btn-secondary:hover {
-            background: #ddd6fe;
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 6px 12px rgba(124, 58, 237, 0.13),
-                0 13px 24px rgba(124, 58, 237, 0.09);
-        }
-
-
-        /* =========================================
-           TICKET TABLE
-        ========================================= */
-
-        .section {
-            background: white;
-
-            border-radius: 18px;
-
-            padding: 28px;
-
-            border: 1px solid #eef2f7;
-
-            box-shadow:
-                0 3px 7px rgba(0, 0, 0, 0.03),
-                0 8px 18px rgba(0, 0, 0, 0.05),
-                0 16px 35px rgba(0, 0, 0, 0.06),
-                0 25px 60px rgba(124, 58, 237, 0.07);
-
-            margin-bottom: 30px;
-        }
-
-        .section-header {
+        .dashboard-card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            align-items: flex-start;
+
+            margin-bottom: 18px;
         }
 
-        .section-header h3 {
+        .dashboard-card-title h3 {
             font-size: 19px;
             color: #172033;
+            margin-bottom: 5px;
+        }
+
+        .dashboard-card-title p {
+            font-size: 12px;
+            color: #94a3b8;
         }
 
         .view-all {
             color: #7c3aed;
             text-decoration: none;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
-
-            transition:
-                transform 0.2s ease,
-                color 0.2s ease;
+            white-space: nowrap;
         }
 
         .view-all:hover {
             color: #6d28d9;
         }
 
-        .table-wrapper {
-            overflow-x: auto;
 
-            border-radius: 12px;
+        /* =========================================
+           SCROLL AREA
+        ========================================= */
 
-            box-shadow:
-                inset 0 0 0 1px rgba(226, 232, 240, 0.75),
-                0 4px 12px rgba(0, 0, 0, 0.025);
+        .scroll-area {
+            flex: 1;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            padding-right: 6px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 750px;
+        .scroll-area::-webkit-scrollbar {
+            width: 6px;
         }
 
-        th {
-            text-align: left;
-
-            padding: 14px;
-
-            background: #f8fafc;
-
-            color: #64748b;
-
-            font-size: 12px;
-
-            border-bottom: 1px solid #e5e7eb;
+        .scroll-area::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
         }
 
-        td {
-            padding: 16px 14px;
-
-            font-size: 13px;
-
-            border-bottom: 1px solid #eef2f7;
-
-            background: white;
-
-            transition:
-                background 0.2s ease,
-                box-shadow 0.2s ease;
+        .scroll-area::-webkit-scrollbar-thumb {
+            background: #c4b5fd;
+            border-radius: 10px;
         }
 
-        tbody tr {
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease;
-        }
-
-        tbody tr:hover td {
-            background: #fcfaff;
-
-            box-shadow:
-                inset 0 2px 6px rgba(124, 58, 237, 0.025),
-                inset 0 -2px 6px rgba(124, 58, 237, 0.025);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .ticket-number {
-            color: #7c3aed;
-            font-weight: bold;
-
-            text-shadow:
-            0 1px 2px rgba(124, 58, 237, 0.10);
-        }
-
-        .ticket-link {
-            text-decoration: none;
-            cursor: pointer;
-
-            transition:
-               color 0.2s ease,
-               transform 0.2s ease;
-        }
-
-        .ticket-link:hover {
-           color: #6d28d9;
-           text-decoration: underline;
+        .scroll-area::-webkit-scrollbar-thumb:hover {
+            background: #a78bfa;
         }
 
 
         /* =========================================
-           BADGES
+           TICKET LIST
+        ========================================= */
+
+        .ticket-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding: 15px 10px;
+
+            border-bottom: 1px solid #eef2f7;
+
+            transition: background 0.2s ease;
+        }
+
+        .ticket-item:first-child {
+            padding-top: 8px;
+        }
+
+        .ticket-item:last-child {
+            border-bottom: none;
+        }
+
+        .ticket-item:hover {
+            background: #faf8ff;
+            border-radius: 9px;
+        }
+
+        .ticket-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .ticket-number {
+            color: #7c3aed;
+            font-size: 13px;
+            font-weight: bold;
+
+            text-decoration: none;
+
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .ticket-number:hover {
+            color: #6d28d9;
+            text-decoration: underline;
+        }
+
+        .ticket-subject {
+            color: #1f2937;
+            font-size: 13px;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            margin-bottom: 5px;
+        }
+
+        .ticket-meta {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        .ticket-action {
+            flex-shrink: 0;
+        }
+
+        .ticket-action a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #7c3aed;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 7px 12px;
+            border-radius: 7px;
+
+            font-size: 11px;
+            font-weight: bold;
+
+            transition: 0.2s ease;
+        }
+
+        .ticket-action a:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+        }
+
+
+        /* =========================================
+           MAINTENANCE LIST
+        ========================================= */
+
+        .maintenance-item {
+            padding: 16px 10px;
+
+            border-bottom: 1px solid #eef2f7;
+
+            transition: background 0.2s ease;
+        }
+
+        .maintenance-item:first-child {
+            padding-top: 8px;
+        }
+
+        .maintenance-item:last-child {
+            border-bottom: none;
+        }
+
+        .maintenance-item:hover {
+            background: #faf8ff;
+            border-radius: 9px;
+        }
+
+        .maintenance-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            gap: 12px;
+
+            margin-bottom: 7px;
+        }
+
+        .maintenance-asset {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1f2937;
+
+            line-height: 1.4;
+        }
+
+        .maintenance-office {
+            font-size: 11px;
+            color: #94a3b8;
+
+            margin-top: 3px;
+        }
+
+        .maintenance-date {
+            font-size: 12px;
+            color: #64748b;
+
+            white-space: nowrap;
+        }
+
+
+        /* =========================================
+           STATUS BADGES
         ========================================= */
 
         .badge {
             display: inline-block;
 
-            padding: 6px 10px;
+            padding: 5px 9px;
 
             border-radius: 20px;
 
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
-
-            box-shadow:
-                0 2px 5px rgba(0, 0, 0, 0.05),
-                0 5px 10px rgba(0, 0, 0, 0.025);
         }
 
         .badge-open {
-            background: #fee2e2;
-            color: #dc2626;
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .badge-assigned {
+            background: #ede9fe;
+            color: #7c3aed;
         }
 
         .badge-process {
@@ -588,30 +623,35 @@
             color: #16a34a;
         }
 
-        .badge-low {
-            background: #e0f2fe;
-            color: #0284c7;
+        .badge-scheduled {
+            background: #dbeafe;
+            color: #2563eb;
         }
 
-        .badge-medium {
+        .badge-waiting {
             background: #fef3c7;
             color: #d97706;
         }
 
-        .badge-high {
-            background: #fee2e2;
-            color: #dc2626;
+        .badge-completed {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .badge-rescheduled {
+            background: #ede9fe;
+            color: #7c3aed;
         }
 
 
         /* =========================================
-           EMPTY
+           EMPTY STATE
         ========================================= */
 
         .empty {
             text-align: center;
 
-            padding: 35px;
+            padding: 45px 20px;
 
             color: #6b7280;
 
@@ -621,10 +661,7 @@
 
             border-radius: 10px;
 
-            font-size: 14px;
-
-            box-shadow:
-                inset 0 0 18px rgba(0, 0, 0, 0.015);
+            font-size: 13px;
         }
 
 
@@ -632,36 +669,68 @@
            RESPONSIVE
         ========================================= */
 
-        @media (max-width: 1100px) {
+        @media (max-width: 1200px) {
 
             .stats {
                 grid-template-columns: repeat(3, 1fr);
             }
 
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-card {
+                height: 430px;
+            }
         }
 
-        @media (max-width: 800px) {
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
 
             .stats {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .action-section {
-                grid-template-columns: 1fr;
-            }
-
             .container {
                 padding: 20px;
             }
+        }
+
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .menu {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
 
             .header {
-                padding: 18px 20px;
+                position: relative;
             }
 
-            .action-card {
-                min-height: 280px;
+            .dashboard-card {
+                height: 400px;
             }
         }
+
 
         @media (max-width: 550px) {
 
@@ -671,15 +740,11 @@
                 gap: 15px;
             }
 
-            .brand img {
-                width: 100px;
-            }
-
-            .brand h1 {
-                font-size: 19px;
-            }
-
             .user-info {
+                width: 100%;
+            }
+
+            .user-text {
                 text-align: left;
             }
 
@@ -691,400 +756,575 @@
                 padding: 15px;
             }
 
-            .action-card {
-                padding: 26px;
-                border-radius: 16px;
-                min-height: auto;
+            .menu {
+                grid-template-columns: 1fr;
             }
 
-            .btn-primary,
-            .btn-secondary {
-                min-width: 140px;
+            .dashboard-card {
+                height: 380px;
+                padding: 20px;
+            }
+
+            .dashboard-card-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .ticket-item {
+                align-items: flex-start;
+            }
+
+            .ticket-action a {
+                padding: 6px 9px;
             }
         }
     </style>
 </head>
 
+
 <body>
 
-<header class="header">
+    <!-- =====================================================
+         SIDEBAR IT SUPPORT
+    ===================================================== -->
 
-    <div class="brand">
+    <aside class="sidebar">
 
-        <img
-            src="{{ asset('images/gateway-logo.webp') }}"
-            alt="Gateway Logo"
-        >
+        <div class="sidebar-brand">
 
-        <div>
-            <h1>IT Helpdesk Gateway</h1>
-            <p>IT Support Dashboard</p>
-        </div>
+            <img
+                src="{{ asset('images/gateway-logo.webp') }}"
+                alt="Gateway Logo"
+            >
 
-    </div>
-
-    <div class="user-info">
-
-        <div>
-            {{ auth()->user()->name }}
-        </div>
-
-
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-
-            <button type="submit" class="logout-btn">
-                Logout
-            </button>
-        </form>
-
-    </div>
-
-</header>
-
-
-<main class="container">
-
-    <!-- WELCOME -->
-
-    <div class="welcome">
-
-        <h2>
-            Selamat Datang, {{ auth()->user()->name }} 👋
-        </h2>
-
-        <p>
-            Kelola laporan masalah IT dan bantu menyelesaikan tiket pengguna.
-        </p>
-
-    </div>
-
-
-    <!-- STATISTICS -->
-
-    <div class="stats">
-
-        <div class="stat-card">
-
-            <div class="icon">🎫</div>
-
-            <div class="label">
-                Total Tiket
-            </div>
-
-            <div class="number">
-                {{ $totalTickets }}
+            <div class="sidebar-brand-text">
+                <h3>IT Helpdesk</h3>
+                <p>Gateway IT Support</p>
             </div>
 
         </div>
 
 
-        <div class="stat-card">
+        <nav class="menu">
 
-            <div class="icon">🔴</div>
-
-            <div class="label">
-                Tiket Baru
-            </div>
-
-            <div class="number">
-                {{ $openTickets }}
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="icon">🔧</div>
-
-            <div class="label">
-                Sedang Diproses
-            </div>
-
-            <div class="number">
-                {{ $inProgressTickets }}
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="icon">✅</div>
-
-            <div class="label">
-                Tiket Selesai
-            </div>
-
-            <div class="number">
-                {{ $resolvedTickets }}
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="icon">🔄</div>
-
-            <div class="label">
-                Perbaikan Ulang
-            </div>
-
-            <div class="number">
-                {{ $reopenedTickets }}
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ACTION -->
-
-    <div class="action-section">
-
-        <!-- TIKET MASUK -->
-
-        <div class="action-card">
-
-            <h3>
-                🎫 Tiket Masuk
-            </h3>
-
-            <p>
-                Lihat laporan masalah IT yang dibuat oleh pengguna
-                dan lakukan penanganan terhadap tiket.
-            </p>
+            <!-- DASHBOARD -->
 
             <a
-                href="{{ route('it-support.tickets') }}"
-                class="btn-primary"
+                href="{{ route('it-support.dashboard') }}"
+                class="active"
             >
-                Lihat Tiket Masuk
+                <span class="menu-icon">🏠</span>
+                <span>Dashboard</span>
             </a>
+
+
+            <!-- TIKET -->
+
+            <div class="menu-title">
+                Tiket
+            </div>
+
+
+            <a href="{{ route('it-support.tickets') }}">
+                <span class="menu-icon">🎫</span>
+                <span>Semua Tiket</span>
+            </a>
+
+
+            <a href="{{ route('it-support.tickets.history') }}">
+                <span class="menu-icon">📜</span>
+                <span>Riwayat Tiket</span>
+            </a>
+
+
+            <!-- MAINTENANCE -->
+
+            <div class="menu-title">
+                Maintenance
+            </div>
+
+
+            <a href="{{ route('it-support.maintenance.pc') }}">
+                <span class="menu-icon">💻</span>
+                <span>PC Maintenance</span>
+            </a>
+
+
+            <a href="{{ route('it-support.maintenance.server') }}">
+                <span class="menu-icon">🌐</span>
+                <span>Internet / Server</span>
+            </a>
+
+
+            <a href="{{ route('it-support.maintenance.history') }}">
+                <span class="menu-icon">📋</span>
+                <span>Riwayat Maintenance</span>
+            </a>
+
+
+            <!-- ASET -->
+
+            <div class="menu-title">
+                Aset
+            </div>
+
+
+            <a href="#">
+                <span class="menu-icon">💻</span>
+                <span>Aset Gateway</span>
+            </a>
+
+
+            <!-- AKUN -->
+
+            <div class="menu-title">
+                Akun
+            </div>
+
+
+            <a href="#">
+                <span class="menu-icon">👤</span>
+                <span>Profil</span>
+            </a>
+
+        </nav>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-logout">
+
+            <form
+                action="{{ route('logout') }}"
+                method="POST"
+            >
+
+                @csrf
+
+                <button type="submit">
+                    🚪 Logout
+                </button>
+
+            </form>
 
         </div>
 
-
-        <!-- TIKET SAYA -->
-
-        <div class="action-card">
-
-            <h3>
-                🛠️ Tiket Saya Tangani
-            </h3>
-
-            <p>
-                Anda sedang menangani
-                <strong>{{ $myTickets->count() }} tiket</strong>.
-                Lanjutkan proses penyelesaian tiket Anda.
-            </p>
+    </aside>
 
 
-            @if ($myTickets->count() > 0)
 
-                <div class="my-ticket-list">
+    <!-- =====================================================
+         MAIN
+    ===================================================== -->
 
-                    @foreach ($myTickets->take(3) as $ticket)
+    <div class="main">
 
-                        <div class="my-ticket-item">
 
-                            <div class="my-ticket-number">
-                                {{ $ticket->ticket_number }}
-                            </div>
+        <!-- HEADER -->
 
-                            <div class="my-ticket-subject">
-                                {{ $ticket->subject }}
-                            </div>
+        <header class="header">
 
-                            <div class="my-ticket-status">
-                                Status:
-                                {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
-                            </div>
+            <div class="header-title">
+
+                <h1>
+                    Dashboard IT Support
+                </h1>
+
+                <p>
+                    IT Helpdesk Management System
+                </p>
+
+            </div>
+
+
+            <div class="user-info">
+
+                <div class="avatar">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+
+                <div class="user-text">
+
+                    <strong>
+                        {{ auth()->user()->name }}
+                    </strong>
+
+                    <div class="role">
+                        IT Support
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================= -->
+
+        <main class="container">
+
+
+            <!-- WELCOME -->
+
+            <div class="welcome">
+
+                <h2>
+                    Selamat Datang, {{ auth()->user()->name }} 👋
+                </h2>
+
+                <p>
+                    Pantau dan tangani laporan masalah IT dari pengguna.
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 STATISTICS
+            ================================================= -->
+
+            <div class="stats">
+
+
+                <!-- TOTAL TIKET -->
+
+                <a
+                    href="{{ route('it-support.tickets') }}"
+                    class="stat-card"
+                >
+
+                    <div class="icon">
+                        🎫
+                    </div>
+
+                    <div class="label">
+                        Total Tiket
+                    </div>
+
+                    <div class="number">
+                        {{ $totalTickets }}
+                    </div>
+
+                </a>
+
+
+
+                <!-- TIKET BARU -->
+
+                <a
+                    href="{{ route('it-support.tickets', ['status' => 'open']) }}"
+                    class="stat-card"
+                >
+
+                    <div class="icon">
+                        🔴
+                    </div>
+
+                    <div class="label">
+                        Tiket Baru
+                    </div>
+
+                    <div class="number">
+                        {{ $openTickets }}
+                    </div>
+
+                </a>
+
+
+
+                <!-- SEDANG DIPROSES -->
+
+                <a
+                    href="{{ route('it-support.tickets', ['status' => 'in_progress']) }}"
+                    class="stat-card"
+                >
+
+                    <div class="icon">
+                        🔧
+                    </div>
+
+                    <div class="label">
+                        Sedang Diproses
+                    </div>
+
+                    <div class="number">
+                        {{ $inProgressTickets }}
+                    </div>
+
+                </a>
+
+
+
+                <!-- TIKET SELESAI -->
+
+                <a
+                    href="{{ route('it-support.tickets', ['status' => 'resolved']) }}"
+                    class="stat-card"
+                >
+
+                    <div class="icon">
+                        ✅
+                    </div>
+
+                    <div class="label">
+                        Tiket Selesai
+                    </div>
+
+                    <div class="number">
+                        {{ $resolvedTickets }}
+                    </div>
+
+                </a>
+
+
+
+                <!-- PERBAIKAN ULANG -->
+
+                <a
+                    href="{{ route('it-support.tickets', ['status' => 'reopened']) }}"
+                    class="stat-card"
+                >
+
+                    <div class="icon">
+                        🔄
+                    </div>
+
+                    <div class="label">
+                        Perbaikan Ulang
+                    </div>
+
+                    <div class="number">
+                        {{ $reopenedTickets }}
+                    </div>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 TIKET MASUK + JADWAL MAINTENANCE
+            ================================================= -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- =================================================
+                     TIKET MASUK
+                ================================================= -->
+
+                <section class="dashboard-card">
+
+                    <div class="dashboard-card-header">
+
+                        <div class="dashboard-card-title">
+
+                            <h3>
+                                🎫 Tiket Masuk
+                            </h3>
+
+                            <p>
+                                Tiket terbaru yang masuk ke sistem
+                            </p>
 
                         </div>
 
-                    @endforeach
 
-                </div>
+                        <a
+                            href="{{ route('it-support.tickets') }}"
+                            class="view-all"
+                        >
+                            Lihat Semua →
+                        </a>
 
-            @else
-
-                <div class="empty-my-ticket">
-                    Belum ada tiket yang Anda tangani.
-                </div>
-
-            @endif
+                    </div>
 
 
-            <a
-                href="{{ route('it-support.my-tickets') }}"
-                class="btn-secondary"
-            >
-                Lihat Tiket Saya
-            </a>
+                    <div class="scroll-area">
 
-        </div>
+                        @forelse ($latestTickets as $ticket)
 
-    </div>
+                            <div class="ticket-item">
 
+                                <div class="ticket-info">
 
-    <!-- TICKET LIST -->
-
-    <div class="section">
-
-        <div class="section-header">
-
-            <h3>
-                List Tiket Terbaru
-            </h3>
-
-            <a
-                href="{{ route('it-support.tickets') }}"
-                class="view-all"
-            >
-                Lihat Semua
-            </a>
-
-        </div>
-
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>No. Tiket</th>
-                        <th>Pelapor</th>
-                        <th>Masalah</th>
-                        <th>Prioritas</th>
-                        <th>Status</th>
-                        <th>Tanggal</th>
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    @forelse ($latestTickets as $ticket)
-
-                        <tr>
-
-                            <td>
-                                <a
-                                   href="{{ route('it-support.tickets.show', $ticket) }}"
-                                   class="ticket-number ticket-link"
-                                >
-                                  {{ $ticket->ticket_number }}
-                                </a>
-                            </td>
-
-
-                            <td>
-                                {{ $ticket->user->name ?? '-' }}
-                            </td>
-
-
-                            <td>
-                                {{ $ticket->subject }}
-                            </td>
-
-
-                            <td>
-
-                                @if ($ticket->priority)
-
-                                    <span class="badge badge-{{ $ticket->priority }}">
-                                       {{ ucfirst($ticket->priority) }}
-                                    </span>
-
-                                @else
-
-                                    <span
-                                       class="badge"
-                                       style="background: #f3f4f6; color: #6b7280;"
+                                    <a
+                                        href="{{ route('it-support.tickets.show', $ticket) }}"
+                                        class="ticket-number"
                                     >
-                                       Belum Ditentukan
+                                        {{ $ticket->ticket_number }}
+                                    </a>
+
+
+                                    <div class="ticket-subject">
+                                        {{ $ticket->subject }}
+                                    </div>
+
+
+                                    <div class="ticket-meta">
+
+                                        {{ $ticket->user->name ?? '-' }}
+
+                                        •
+
+                                        {{ $ticket->created_at->format('d/m/Y H:i') }}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="ticket-action">
+
+                                    <a
+                                        href="{{ route('it-support.tickets.show', $ticket) }}"
+                                    >
+                                        Lihat
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        @empty
+
+                            <div class="empty">
+                                Belum ada tiket yang masuk.
+                            </div>
+
+                        @endforelse
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     JADWAL MAINTENANCE
+                ================================================= -->
+
+                <section class="dashboard-card">
+
+                    <div class="dashboard-card-header">
+
+                        <div class="dashboard-card-title">
+
+                            <h3>
+                                📅 Jadwal Maintenance
+                            </h3>
+
+                            <p>
+                                Jadwal maintenance yang perlu ditangani
+                            </p>
+
+                        </div>
+
+
+                        <a
+                            href="{{ route('it-support.maintenance.pc') }}"
+                            class="view-all"
+                        >
+                            Lihat Semua →
+                        </a>
+
+                    </div>
+
+
+                    <div class="scroll-area">
+
+                        @forelse ($maintenanceSchedules as $schedule)
+
+                            <div class="maintenance-item">
+
+                                <div class="maintenance-top">
+
+                                    <div>
+
+                                        <div class="maintenance-asset">
+
+                                            {{ $schedule->asset->name ?? 'Aset tidak tersedia' }}
+
+                                        </div>
+
+
+                                        <div class="maintenance-office">
+
+                                            {{ $schedule->office->name ?? '-' }}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="maintenance-date">
+
+                                        {{ $schedule->scheduled_date->format('d/m/Y') }}
+
+                                    </div>
+
+                                </div>
+
+
+                                @if ($schedule->status === 'scheduled')
+
+                                    <span class="badge badge-scheduled">
+                                        Terjadwal
                                     </span>
 
-                                @endif
+                                @elseif ($schedule->status === 'waiting_confirmation')
 
-                            </td>
-
-
-                            <td>
-
-                                @if ($ticket->status === 'open')
-
-                                    <span class="badge badge-open">
-                                        Baru
+                                    <span class="badge badge-waiting">
+                                        Menunggu Konfirmasi User
                                     </span>
 
-                                @elseif ($ticket->status === 'in_progress' && $ticket->reopen_reason)
+                                @elseif ($schedule->status === 'completed')
 
-                                    <span class="badge badge-process">
-                                        Perbaikan Ulang
-                                    </span>
-
-                                @elseif ($ticket->status === 'in_progress')
-
-                                    <span class="badge badge-process">
-                                        Diproses
-                                    </span>
-
-                                @elseif ($ticket->status === 'resolved')
-
-                                    <span class="badge badge-resolved">
+                                    <span class="badge badge-completed">
                                         Selesai
                                     </span>
 
+                                @elseif ($schedule->status === 'rescheduled')
+
+                                    <span class="badge badge-rescheduled">
+                                        Dijadwalkan Ulang
+                                    </span>
+
                                 @else
 
-                                    <span class="badge badge-process">
-                                        {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
+                                    <span class="badge">
+                                        {{ ucfirst(str_replace('_', ' ', $schedule->status)) }}
                                     </span>
 
                                 @endif
 
-                            </td>
+                            </div>
+
+                        @empty
+
+                            <div class="empty">
+                                Belum ada jadwal maintenance.
+                            </div>
+
+                        @endforelse
+
+                    </div>
+
+                </section>
+
+            </div>
 
 
-                            <td>
-                                {{ $ticket->created_at->format('d/m/Y H:i') }}
-                            </td>
-
-                        </tr>
-
-                    @empty
-
-                        <tr>
-
-                            <td colspan="6">
-
-                                <div class="empty">
-                                    Belum ada tiket yang perlu ditangani.
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                    @endforelse
-
-                </tbody>
-
-            </table>
-
-        </div>
+        </main>
 
     </div>
 
-</main>
-
 </body>
+
 </html>

@@ -63,8 +63,8 @@ Fitur utama:
 
 Metode penanganan yang tersedia:
 
-- Tatap Muka
-- Remote
+- Remote Offline
+- Remote By Sistem
 
 ---
 

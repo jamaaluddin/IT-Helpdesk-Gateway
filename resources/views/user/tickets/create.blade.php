@@ -293,6 +293,41 @@
         }
 
         /* =========================
+           HANDLING METHOD
+        ========================= */
+
+        .handling-method-group {
+            display: none;
+        }
+
+        /* =========================
+           REMOTE ACCESS
+        ========================= */
+
+        .remote-access {
+            display: none;
+            margin-top: -5px;
+            padding: 18px;
+            background: #f8fbff;
+            border: 1px solid #dbeafe;
+            border-radius: 11px;
+
+            box-shadow:
+                0 5px 15px rgba(37, 99, 235, 0.05);
+        }
+
+        .remote-access .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .remote-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+
+        /* =========================
            FILE UPLOAD
         ========================= */
 
@@ -686,6 +721,156 @@
             </div>
 
 
+            <!-- METODE PENANGANAN -->
+
+            <div
+                class="form-group handling-method-group"
+                id="handlingMethodGroup"
+            >
+
+                <label>
+                    Metode Penanganan
+                    <span class="required">*</span>
+                </label>
+
+                <select
+                    name="handling_method"
+                    id="handling_method"
+                >
+
+                    <option value="">
+                        -- Pilih metode penanganan --
+                    </option>
+
+                    <option
+                        value="in_person"
+                        {{ old('handling_method') == 'in_person' ? 'selected' : '' }}
+                    >
+                        🏢 Offline
+                    </option>
+
+                    <option
+                        value="remote"
+                        {{ old('handling_method') == 'remote' ? 'selected' : '' }}
+                    >
+                        💻 Remote
+                    </option>
+
+                </select>
+
+                <div class="help-text">
+                    Pilih metode yang paling sesuai untuk membantu tim IT menangani masalah Anda.
+                </div>
+
+            </div>
+
+
+            <!-- INFORMASI REMOTE -->
+
+            <div
+                class="remote-access"
+                id="remoteAccess"
+            >
+
+                <div class="remote-title">
+                    💻 Informasi Remote
+                </div>
+
+
+                <!-- APLIKASI REMOTE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Aplikasi Remote
+                        <span class="required">*</span>
+                    </label>
+
+                    <select
+                        name="remote_application"
+                        id="remote_application"
+                    >
+
+                        <option value="">
+                            -- Pilih aplikasi remote --
+                        </option>
+
+                        <option
+                            value="anydesk"
+                            {{ old('remote_application') == 'anydesk' ? 'selected' : '' }}
+                        >
+                            AnyDesk
+                        </option>
+
+                        <option
+                            value="teamviewer"
+                            {{ old('remote_application') == 'teamviewer' ? 'selected' : '' }}
+                        >
+                            TeamViewer
+                        </option>
+
+                        <option
+                            value="ultraviewer"
+                            {{ old('remote_application') == 'ultraviewer' ? 'selected' : '' }}
+                        >
+                            UltraViewer
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- REMOTE ADDRESS -->
+
+                <div class="form-group">
+
+                    <label>
+                        Remote Address
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        name="remote_address"
+                        id="remote_address"
+                        value="{{ old('remote_address') }}"
+                        placeholder="Masukkan Remote Address"
+                    >
+
+                    <div class="help-text">
+                        Masukkan alamat atau ID remote yang dapat digunakan oleh IT Support.
+                    </div>
+
+                </div>
+
+
+                <!-- REMOTE PASSWORD -->
+
+                <div class="form-group">
+
+                    <label>
+                        Remote Password
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        name="remote_password"
+                        id="remote_password"
+                        value="{{ old('remote_password') }}"
+                        placeholder="Masukkan password remote"
+                    >
+
+                    <div class="help-text">
+                        Masukkan password remote yang diperlukan untuk koneksi.
+                    </div>
+
+                </div>
+
+            </div>
+
+
             <!-- FOTO -->
 
             <div class="form-group">
@@ -709,8 +894,6 @@
                 </div>
 
             </div>
-
-
 
 
             <!-- BUTTON -->
@@ -742,28 +925,67 @@
 
 <script>
 
+    /* =========================
+       ELEMENT
+    ========================= */
+
     const categorySelect =
         document.getElementById('category_id');
 
     const otherProblem =
         document.getElementById('otherProblem');
 
+    const handlingMethodGroup =
+        document.getElementById('handlingMethodGroup');
 
-    function checkOtherCategory() {
+    const handlingMethod =
+        document.getElementById('handling_method');
+
+    const remoteAccess =
+        document.getElementById('remoteAccess');
+
+    const remoteApplication =
+        document.getElementById('remote_application');
+
+    const remoteAddress =
+        document.getElementById('remote_address');
+
+    const remotePassword =
+        document.getElementById('remote_password');
+
+
+    /* =========================
+       CEK KATEGORI LAINNYA
+    ========================= */
+
+    function checkCategory() {
 
         const selectedOption =
             categorySelect.options[
                 categorySelect.selectedIndex
             ];
 
+        let isOtherCategory = false;
+
 
         if (
             selectedOption &&
-            selectedOption.dataset.name &&
             selectedOption.dataset.name
-                .toLowerCase()
-                .includes('lainnya')
         ) {
+
+            isOtherCategory =
+                selectedOption.dataset.name
+                    .toLowerCase()
+                    .includes('lainnya');
+
+        }
+
+
+        /* =========================
+           MASALAH LAINNYA
+        ========================= */
+
+        if (isOtherCategory) {
 
             otherProblem.style.display = 'block';
 
@@ -773,16 +995,95 @@
 
         }
 
+
+        /* =========================
+           METODE PENANGANAN
+        ========================= */
+
+        if (isOtherCategory) {
+
+            handlingMethodGroup.style.display = 'block';
+
+            handlingMethod.required = true;
+
+        } else {
+
+            handlingMethodGroup.style.display = 'none';
+
+            handlingMethod.required = false;
+
+            handlingMethod.value = '';
+
+            hideRemoteAccess();
+
+        }
+
     }
 
 
+    /* =========================
+       CEK METODE REMOTE
+    ========================= */
+
+    function checkHandlingMethod() {
+
+        if (
+            handlingMethod.value === 'remote'
+        ) {
+
+            remoteAccess.style.display = 'block';
+
+            remoteApplication.required = true;
+            remoteAddress.required = true;
+            remotePassword.required = true;
+
+        } else {
+
+            hideRemoteAccess();
+
+        }
+
+    }
+
+
+    /* =========================
+       HIDE REMOTE
+    ========================= */
+
+    function hideRemoteAccess() {
+
+        remoteAccess.style.display = 'none';
+
+        remoteApplication.required = false;
+        remoteAddress.required = false;
+        remotePassword.required = false;
+
+    }
+
+
+    /* =========================
+       EVENT
+    ========================= */
+
     categorySelect.addEventListener(
         'change',
-        checkOtherCategory
+        checkCategory
     );
 
 
-    checkOtherCategory();
+    handlingMethod.addEventListener(
+        'change',
+        checkHandlingMethod
+    );
+
+
+    /* =========================
+       INITIAL CHECK
+    ========================= */
+
+    checkCategory();
+
+    checkHandlingMethod();
 
 </script>
 

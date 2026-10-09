@@ -33,19 +33,75 @@ class TicketController extends Controller
             abort(403);
         }
 
-        $ticket->load('category');
+        $ticket->load(['category', 'office', 'department']);
 
         return view('user.tickets.show', compact('ticket'));
     }
 
     public function store(Request $request)
     {
+        // Validasi dasar
         $request->validate([
             'subject' => 'required|string|max:255',
             'category_id' => 'required|exists:ticket_categories,id',
             'description' => 'required|string',
             'problem_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'handling_method' => 'nullable|in:in_person,remote',
+            'remote_application' => 'nullable|in:anydesk,teamviewer,ultraviewer',
+            'remote_address' => 'nullable|string|max:255',
+            'remote_password' => 'nullable|string|max:255',
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cek kategori
+        |--------------------------------------------------------------------------
+        */
+
+        $category = TicketCategory::findOrFail($request->category_id);
+
+        $isOtherCategory = str_contains(
+            strtolower($category->name),
+            'lainnya'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validasi metode penanganan
+        |--------------------------------------------------------------------------
+        */
+
+        if ($isOtherCategory && !$request->handling_method) {
+            return back()
+                ->withErrors([
+                    'handling_method' => 'Metode penanganan wajib dipilih.'
+                ])
+                ->withInput();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validasi data Remote
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $isOtherCategory &&
+            $request->handling_method === 'remote'
+        ) {
+            $request->validate([
+                'remote_application' => 'required|in:anydesk,teamviewer,ultraviewer',
+                'remote_address' => 'required|string|max:255',
+                'remote_password' => 'required|string|max:255',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Upload gambar masalah
+        |--------------------------------------------------------------------------
+        */
 
         $problemImagePath = null;
 
@@ -63,13 +119,14 @@ class TicketController extends Controller
         | TKT-YYYYMMDD0002
         | TKT-YYYYMMDD0003
         |
-        | Nomor akan kembali ke 0001 pada tanggal berikutnya.
+        | Nomor kembali ke 0001 pada tanggal berikutnya.
         |--------------------------------------------------------------------------
         */
 
         $ticket = DB::transaction(function () use (
             $request,
-            $problemImagePath
+            $problemImagePath,
+            $isOtherCategory
         ) {
             $today = now()->toDateString();
 
@@ -123,14 +180,52 @@ class TicketController extends Controller
              */
             return Ticket::create([
                 'ticket_number' => $ticketNumber,
+
                 'user_id' => auth()->id(),
                 'office_id' => auth()->user()->office_id,
                 'department_id' => auth()->user()->department_id,
+
                 'category_id' => $request->category_id,
                 'subject' => $request->subject,
                 'description' => $request->description,
                 'problem_image' => $problemImagePath,
+
+                // Priority tetap ditentukan oleh IT Support
                 'priority' => null,
+
+                /*
+                 * Handling method hanya disimpan
+                 * jika kategori adalah Lainnya.
+                 */
+                'handling_method' => $isOtherCategory
+                    ? $request->handling_method
+                    : null,
+
+                /*
+                 * Data Remote hanya disimpan
+                 * jika metode yang dipilih adalah Remote.
+                 */
+                'remote_application' => (
+                    $isOtherCategory &&
+                    $request->handling_method === 'remote'
+                )
+                    ? $request->remote_application
+                    : null,
+
+                'remote_address' => (
+                    $isOtherCategory &&
+                    $request->handling_method === 'remote'
+                )
+                    ? $request->remote_address
+                    : null,
+
+                'remote_password' => (
+                    $isOtherCategory &&
+                    $request->handling_method === 'remote'
+                )
+                    ? $request->remote_password
+                    : null,
+
                 'status' => 'open',
             ]);
         });

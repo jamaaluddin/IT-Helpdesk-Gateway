@@ -333,6 +333,101 @@
         }
 
         /* =========================
+           HANDLING METHOD
+        ========================== */
+
+        .handling-remote {
+            border-color: #ddd6fe;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #faf9ff,
+                    #f5f3ff
+                );
+        }
+
+        .handling-title {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .remote-detail {
+            grid-column: 1 / -1;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #faf9ff,
+                    #f5f3ff
+                );
+
+            border: 1px solid #ddd6fe;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            box-shadow:
+                0 3px 8px rgba(124, 58, 237, 0.05),
+                0 8px 18px rgba(124, 58, 237, 0.04);
+        }
+
+        .remote-detail-title {
+            font-size: 15px;
+
+            font-weight: 700;
+
+            color: #5b21b6;
+
+            margin-bottom: 16px;
+        }
+
+        .remote-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 15px;
+        }
+
+        .remote-item {
+            background: white;
+
+            border: 1px solid #e9e3ff;
+
+            border-radius: 10px;
+
+            padding: 13px 14px;
+        }
+
+        .remote-item .remote-label {
+            font-size: 10px;
+
+            color: #7c3aed;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.3px;
+
+            margin-bottom: 6px;
+        }
+
+        .remote-item .remote-value {
+            font-size: 14px;
+
+            font-weight: 600;
+
+            color: #1f2937;
+
+            word-break: break-word;
+        }
+
+        /* =========================
            BADGES
         ========================== */
 
@@ -759,6 +854,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .remote-grid {
+                grid-template-columns: 1fr;
+            }
+
             .card {
                 padding: 25px;
             }
@@ -918,6 +1017,7 @@
 
         <div class="info-grid">
 
+            {{-- NOMOR TIKET --}}
             <div class="info-box">
 
                 <div class="label">
@@ -931,6 +1031,7 @@
             </div>
 
 
+            {{-- PELAPOR --}}
             <div class="info-box">
 
                 <div class="label">
@@ -944,6 +1045,7 @@
             </div>
 
 
+            {{-- MASALAH --}}
             <div class="info-box">
 
                 <div class="label">
@@ -957,89 +1059,178 @@
             </div>
 
 
+            {{-- KATEGORI --}}
             <div class="info-box">
 
-    <div class="label">
-        Prioritas
-    </div>
+                <div class="label">
+                    Kategori
+                </div>
 
-    <div class="value">
+                <div class="value">
+                    {{ $ticket->category->name ?? '-' }}
+                </div>
 
-        @if (
-            $ticket->assigned_to === auth()->id() &&
-            in_array($ticket->status, ['assigned', 'in_progress'])
-        )
-
-            <form
-                action="{{ route('it-support.tickets.priority', $ticket) }}"
-                method="POST"
-            >
-                @csrf
-
-                <select
-                    name="priority"
-                    onchange="this.form.submit()"
-                    style="
-                        width: 100%;
-                        padding: 10px 12px;
-                        border: 1px solid #ddd6fe;
-                        border-radius: 9px;
-                        background: #faf9ff;
-                        color: #374151;
-                        font-size: 13px;
-                        font-weight: 600;
-                        outline: none;
-                        cursor: pointer;
-                    "
-                >
-
-                    <option value="" disabled
-                        {{ $ticket->priority === null ? 'selected' : '' }}>
-                        Belum Ditentukan
-                    </option>
-
-                    <option value="low"
-                        {{ $ticket->priority === 'low' ? 'selected' : '' }}>
-                        Low - Tidak mendesak
-                    </option>
-
-                    <option value="medium"
-                        {{ $ticket->priority === 'medium' ? 'selected' : '' }}>
-                        Medium - Normal
-                    </option>
-
-                    <option value="high"
-                        {{ $ticket->priority === 'high' ? 'selected' : '' }}>
-                        High - Mengganggu pekerjaan
-                    </option>
-
-                    <option value="critical"
-                        {{ $ticket->priority === 'critical' ? 'selected' : '' }}>
-                        Critical - Pekerjaan terhenti
-                    </option>
-
-                </select>
-            </form>
-
-        @elseif ($ticket->priority)
-
-            <span class="badge priority-{{ $ticket->priority }}">
-                {{ ucfirst($ticket->priority) }}
-            </span>
-
-        @else
-
-            <span class="badge" style="background:#f3f4f6; color:#6b7280;">
-                Belum Ditentukan
-            </span>
-
-        @endif
-
-    </div>
-
-</div>
+            </div>
 
 
+            {{-- CABANG --}}
+            <div class="info-box">
+
+                <div class="label">
+                    Cabang
+                </div>
+
+                <div class="value">
+                    {{ $ticket->office->name ?? '-' }}
+                </div>
+
+            </div>
+
+
+            {{-- DEPARTEMEN --}}
+            <div class="info-box">
+
+                <div class="label">
+                    Departemen
+                </div>
+
+                <div class="value">
+                    {{ $ticket->department->name ?? '-' }}
+                </div>
+
+            </div>
+
+
+            {{-- METODE PENANGANAN --}}
+            @if ($ticket->handling_method)
+
+                <div class="info-box {{ $ticket->handling_method === 'remote' ? 'handling-remote' : '' }}">
+
+                    <div class="label handling-title">
+
+                        @if ($ticket->handling_method === 'remote')
+                            🌐
+                        @else
+                            🧑‍💻
+                        @endif
+
+                        Metode Penanganan
+
+                    </div>
+
+                    <div class="value">
+
+                        @if ($ticket->handling_method === 'remote')
+
+                            Remote
+
+                        @elseif ($ticket->handling_method === 'in_person')
+
+                            Tatap Muka
+
+                        @else
+
+                            -
+
+                        @endif
+
+                    </div>
+
+                </div>
+
+            @endif
+
+
+            {{-- PRIORITAS --}}
+            <div class="info-box">
+
+                <div class="label">
+                    Prioritas
+                </div>
+
+                <div class="value">
+
+                    @if (
+                        $ticket->assigned_to === auth()->id() &&
+                        in_array($ticket->status, ['assigned', 'in_progress'])
+                    )
+
+                        <form
+                            action="{{ route('it-support.tickets.priority', $ticket) }}"
+                            method="POST"
+                        >
+
+                            @csrf
+
+                            <select
+                                name="priority"
+                                onchange="this.form.submit()"
+                                style="
+                                    width: 100%;
+                                    padding: 10px 12px;
+                                    border: 1px solid #ddd6fe;
+                                    border-radius: 9px;
+                                    background: #faf9ff;
+                                    color: #374151;
+                                    font-size: 13px;
+                                    font-weight: 600;
+                                    outline: none;
+                                    cursor: pointer;
+                                "
+                            >
+
+                                <option value="" disabled
+                                    {{ $ticket->priority === null ? 'selected' : '' }}>
+                                    Belum Ditentukan
+                                </option>
+
+                                <option value="low"
+                                    {{ $ticket->priority === 'low' ? 'selected' : '' }}>
+                                    Low - Tidak mendesak
+                                </option>
+
+                                <option value="medium"
+                                    {{ $ticket->priority === 'medium' ? 'selected' : '' }}>
+                                    Medium - Normal
+                                </option>
+
+                                <option value="high"
+                                    {{ $ticket->priority === 'high' ? 'selected' : '' }}>
+                                    High - Mengganggu pekerjaan
+                                </option>
+
+                                <option value="critical"
+                                    {{ $ticket->priority === 'critical' ? 'selected' : '' }}>
+                                    Critical - Pekerjaan terhenti
+                                </option>
+
+                            </select>
+
+                        </form>
+
+                    @elseif ($ticket->priority)
+
+                        <span class="badge priority-{{ $ticket->priority }}">
+                            {{ ucfirst($ticket->priority) }}
+                        </span>
+
+                    @else
+
+                        <span
+                            class="badge"
+                            style="background:#f3f4f6; color:#6b7280;"
+                        >
+                            Belum Ditentukan
+                        </span>
+
+                    @endif
+
+                </div>
+
+            </div>
+
+
+            {{-- STATUS --}}
             <div class="info-box">
 
                 <div class="label">
@@ -1096,9 +1287,83 @@
 
             </div>
 
+
+            {{-- DETAIL REMOTE --}}
+            @if (
+                $ticket->handling_method === 'remote' &&
+                (
+                    $ticket->remote_application ||
+                    $ticket->remote_address ||
+                    $ticket->remote_password
+                )
+            )
+
+                <div class="remote-detail">
+
+                    <div class="remote-detail-title">
+                        🌐 Informasi Remote
+                    </div>
+
+                    <div class="remote-grid">
+
+                        <div class="remote-item">
+
+                            <div class="remote-label">
+                                Aplikasi
+                            </div>
+
+                            <div class="remote-value">
+
+                                @if ($ticket->remote_application === 'anydesk')
+                                    AnyDesk
+                                @elseif ($ticket->remote_application === 'teamviewer')
+                                    TeamViewer
+                                @elseif ($ticket->remote_application === 'ultraviewer')
+                                    UltraViewer
+                                @else
+                                    -
+                                @endif
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="remote-item">
+
+                            <div class="remote-label">
+                                Remote Address
+                            </div>
+
+                            <div class="remote-value">
+                                {{ $ticket->remote_address ?? '-' }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="remote-item">
+
+                            <div class="remote-label">
+                                Remote Password
+                            </div>
+
+                            <div class="remote-value">
+                                {{ $ticket->remote_password ?? '-' }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            @endif
+
         </div>
 
 
+        {{-- ALASAN REOPEN --}}
         @if ($ticket->reopen_reason)
 
             <div class="row">
@@ -1116,6 +1381,7 @@
         @endif
 
 
+        {{-- DESKRIPSI --}}
         <div class="row">
 
             <div class="label">
@@ -1129,6 +1395,7 @@
         </div>
 
 
+        {{-- FOTO MASALAH --}}
         @if ($ticket->problem_image)
 
             <div class="row">
@@ -1151,6 +1418,7 @@
         @endif
 
 
+        {{-- TANGGAL LAPORAN --}}
         <div class="row">
 
             <div class="label">
@@ -1175,6 +1443,7 @@
             </div>
 
 
+            {{-- AMBIL TIKET --}}
             @if ($ticket->status === 'open')
 
                 <form
@@ -1197,6 +1466,7 @@
             @endif
 
 
+            {{-- MULAI MENANGANI --}}
             @if ($ticket->status === 'assigned')
 
                 <form
@@ -1219,6 +1489,7 @@
             @endif
 
 
+            {{-- SELESAIKAN TIKET --}}
             @if ($ticket->status === 'in_progress')
 
                 @if ($errors->any())
@@ -1319,6 +1590,7 @@
         </div>
 
 
+        {{-- KEMBALI --}}
         <a
             href="{{ route('it-support.tickets') }}"
             class="back-btn"

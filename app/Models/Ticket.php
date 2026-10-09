@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Models\Office;
+use App\Models\Department;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -23,6 +25,10 @@ class Ticket extends Model
         'reopen_reason',
         'evidence',
         'priority',
+        'handling_method',
+        'remote_application',
+        'remote_address',
+        'remote_password',
         'status',
         'assigned_to',
         'assigned_at',
@@ -38,6 +44,17 @@ class Ticket extends Model
 
     public function user(): BelongsTo
     {
-    return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function office(): BelongsTo
+    {
+        return $this->belongsTo(Office::class, 'office_id');
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
 }
