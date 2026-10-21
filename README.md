@@ -103,17 +103,3 @@ Informasi tiket meliputi:
 - Waktu penanganan
 - Waktu penyelesaian
 
-### Status Tiket
-
-Beberapa status yang digunakan dalam proses ticketing:
-
-```text
-Open
-  ↓
-Assigned
-  ↓
-In Progress
-  ↓
-Resolved
-  ↓
-Closed
