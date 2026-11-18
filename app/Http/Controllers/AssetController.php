@@ -13,6 +13,7 @@ class AssetController extends Controller
 {
     public function index()
     {
+        // Mengambil seluruh data aset beserta relasinya
         $assets = Asset::with([
             'assetType',
             'office',
@@ -21,8 +22,32 @@ class AssetController extends Controller
         ->latest()
         ->get();
 
-        return view('admin.assets.index', compact('assets'));
-    }
+        // Mengambil seluruh kategori aset
+       $assetTypes = AssetType::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        // Menghitung jumlah aset untuk setiap kategori
+        $categoryCounts = Asset::selectRaw('asset_type_id, COUNT(*) as total')
+            ->groupBy('asset_type_id')
+            ->pluck('total', 'asset_type_id');
+
+        // Ringkasan aset
+        $totalAssets = Asset::count();
+
+        $activeAssets = Asset::where('status', '!=', 'retired')->count();
+
+        $retiredAssets = Asset::where('status', 'retired')->count();
+
+        return view('admin.assets.index', compact(
+            'assets',
+            'assetTypes',
+            'categoryCounts',
+            'totalAssets',
+            'activeAssets',
+            'retiredAssets'
+        ));
+}
 
     public function show(Asset $asset)
     {

@@ -14,7 +14,7 @@ class UserApprovalController extends Controller
         ]);
 
         return redirect()
-            ->route('admin.dashboard')
+            ->route('admin.users.index')
             ->with('success', 'User berhasil disetujui.');
     }
 
@@ -25,7 +25,7 @@ class UserApprovalController extends Controller
         ]);
 
         return redirect()
-            ->route('admin.dashboard')
+            ->route('admin.users.index')
             ->with('success', 'User berhasil ditolak.');
     }
 }

@@ -4,7 +4,10 @@
 @section('page-title', 'Kelola Jenis Aset')
 @section('page-subtitle', 'Pengaturan kategori aset IT Helpdesk Gateway')
 
+@section('content')
+
 @push('styles')
+
     /* PAGE CONTENT */
     .back-link {
         display: inline-flex;
@@ -340,9 +343,9 @@
             font-size: 21px;
         }
     }
+
 @endpush
 
-@section('content')
 
     <a href="{{ route('admin.assets.index') }}" class="back-link">
         ← Kembali ke Asset Management

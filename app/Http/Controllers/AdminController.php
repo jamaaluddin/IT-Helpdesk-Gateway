@@ -295,6 +295,18 @@ class AdminController extends Controller
 
         $totalUsers = (clone $userQuery)->count();
 
+        // Mengambil pengguna yang masih menunggu persetujuan Admin
+        $pendingApprovalUsers = (clone $userQuery)
+            ->where('users.status', 'pending')
+            ->select('users.*')
+            ->orderByDesc('users.created_at')
+            ->get();
+
+        $userRoleStats = (clone $userQuery)
+            ->selectRaw('roles.name as role_name, COUNT(*) as total')
+            ->groupBy('roles.name')
+            ->pluck('total', 'role_name');
+
         $userRoleStats = (clone $userQuery)
             ->selectRaw('roles.name as role_name, COUNT(*) as total')
             ->groupBy('roles.name')
@@ -538,6 +550,7 @@ class AdminController extends Controller
             'totalConfirmations',
             'effectivenessPercentage',
             'totalUsers',
+            'pendingApprovalUsers',
             'userRoleStats',
             'userStatusStats',
             'totalHandledTickets',
@@ -558,5 +571,126 @@ class AdminController extends Controller
             'ticketDetails'
         ));
     }
+
+
+    public function users(Request $request)
+    {
+        // Statistik akun
+        $totalUsers = User::count();
+        $activeUsers = User::where('status', 'active')->count();
+        $pendingUsers = User::where('status', 'pending')->count();
+        $rejectedUsers = User::where('status', 'rejected')->count();
+
+        // Daftar user
+        $usersQuery = DB::table('users')
+            ->leftJoin('roles', 'roles.id', '=', 'users.role_id')
+            ->leftJoin('offices', 'offices.id', '=', 'users.office_id')
+            ->leftJoin('departments', 'departments.id', '=', 'users.department_id')
+            ->select(
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.phone',
+                'users.status',
+                'users.created_at',
+                'users.role_id',
+                'users.office_id',
+                'users.department_id',
+                'roles.name as role_name',
+                'offices.name as office_name',
+                'departments.name as department_name'
+            );
+
+        // Pencarian nama atau email
+        $usersQuery->when($request->filled('search'), function ($query) use ($request) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('users.name', 'like', "%{$search}%")
+                    ->orWhere('users.email', 'like', "%{$search}%");
+            });
+        });
+
+        // Filter status
+        if (in_array($request->status, ['active', 'pending', 'rejected'])) {
+            $usersQuery->where('users.status', $request->status);
+        }
+
+        // Filter kantor/cabang
+        if ($request->filled('office_id')) {
+            $usersQuery->where('users.office_id', $request->office_id);
+        }
+
+        // Filter departemen
+        if ($request->filled('department_id')) {
+            $usersQuery->where('users.department_id', $request->department_id);
+        }
+
+        // Filter role
+        if ($request->filled('role_id')) {
+            $usersQuery->where('users.role_id', $request->role_id);
+        }
+
+        // Filter periode pendaftaran
+        if ($request->filled('start_date')) {
+            $usersQuery->whereDate('users.created_at', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $usersQuery->whereDate('users.created_at', '<=', $request->end_date);
+        }
+
+        $users = $usersQuery
+            ->orderByDesc('users.created_at')
+            ->paginate(10)
+            ->withQueryString();
+
+
+        // Daftar akun yang menunggu persetujuan
+        $pendingApprovalUsers = DB::table('users')
+            ->leftJoin('roles', 'roles.id', '=', 'users.role_id')
+            ->leftJoin('offices', 'offices.id', '=', 'users.office_id')
+            ->leftJoin('departments', 'departments.id', '=', 'users.department_id')
+            ->where('users.status', 'pending')
+            ->select(
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.phone',
+                'users.created_at',
+                'roles.name as role_name',
+                'offices.name as office_name',
+                'departments.name as department_name'
+            )
+            ->orderBy('users.created_at')
+            ->get();
+
+
+        // Data pilihan filter
+        $offices = DB::table('offices')
+            ->orderBy('name')
+            ->get();
+
+        $departments = DB::table('departments')
+            ->orderBy('name')
+            ->get();
+
+        $roles = DB::table('roles')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.users.index', compact(
+            'users',
+            'pendingApprovalUsers',
+            'totalUsers',
+            'activeUsers',
+            'pendingUsers',
+            'rejectedUsers',
+            'offices',
+            'departments',
+            'roles'
+        ));
+    }
+
 
 }

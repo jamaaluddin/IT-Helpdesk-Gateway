@@ -1,6 +1,8 @@
 @extends('layouts.admin')
 
 @section('title', 'Laporan Sistem')
+@section('page-title', 'Laporan Sistem IT Helpdesk')
+@section('page-subtitle', 'Kelola dan pantau performa operasional IT Helpdesk PT Gateway')
 
 @section('content')
 

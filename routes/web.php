@@ -20,6 +20,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Authentication Routes
+
 Route::get('/register', [AuthController::class, 'showRegister'])
     ->name('register');
 
@@ -31,6 +33,8 @@ Route::get('/login', [LoginController::class, 'showLogin'])
 
 Route::post('/login', [LoginController::class, 'login'])
     ->name('login.process');
+
+// Admin Routes
 
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
     ->middleware('admin')
@@ -95,6 +99,21 @@ Route::patch('/admin/asset-types/{assetType}/toggle-status', [AssetTypeControlle
 Route::get('/admin/reports', [AdminController::class, 'report'])
     ->middleware('admin')
     ->name('admin.reports.index');
+
+Route::get('/admin/users', [AdminController::class, 'users'])
+    ->middleware('admin')
+    ->name('admin.users.index');
+
+Route::post('/admin/users/{user}/approve', [UserApprovalController::class, 'approve'])
+    ->middleware('admin')
+    ->name('admin.users.approve');
+
+Route::post('/admin/users/{user}/reject', [UserApprovalController::class, 'reject'])
+    ->middleware('admin')
+    ->name('admin.users.reject');
+
+
+// IT Support Routes
 
 Route::get('/it-support/dashboard', [ITSupportController::class, 'dashboard'])
     ->middleware(['auth', 'role:IT Support'])
@@ -200,6 +219,8 @@ Route::post('/it-support/tickets/{ticket}/resolve', [ITSupportController::class,
     ->middleware(['auth', 'role:IT Support'])
     ->name('it-support.tickets.resolve');
 
+// User Routes
+
 Route::get('/user/dashboard', [UserController::class, 'dashboard'])
     ->middleware(['auth', 'role:User'])
     ->name('user.dashboard');
@@ -227,14 +248,6 @@ Route::post('/user/tickets/{ticket}/close', [TicketController::class, 'close'])
 Route::post('/user/tickets/{ticket}/reopen', [TicketController::class, 'reopen'])
     ->middleware(['auth', 'role:User'])
     ->name('tickets.reopen');
-
-Route::post('/admin/users/{user}/approve', [UserApprovalController::class, 'approve'])
-    ->middleware('admin')
-    ->name('admin.users.approve');
-
-Route::post('/admin/users/{user}/reject', [UserApprovalController::class, 'reject'])
-    ->middleware('admin')
-    ->name('admin.users.reject');
 
 Route::post('/logout', function () {
     auth()->logout();

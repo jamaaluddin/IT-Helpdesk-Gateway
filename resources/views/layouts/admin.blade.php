@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title', 'Admin - IT Helpdesk Gateway')</title>
+    <title>@yield('title', 'IT Support - IT Helpdesk Gateway')</title>
 
     <style>
         * {
@@ -45,15 +45,15 @@
         }
 
         /* =========================
-           SIDEBAR
+           SIDEBAR IT SUPPORT
         ========================== */
 
         .sidebar {
             width: 250px;
             flex: 0 0 250px;
-            background: #064e3b;
+            background: #4c1d95;
             color: white;
-            padding: 24px 18px;
+            padding: 24px 14px;
             position: fixed;
             left: 0;
             top: 0;
@@ -69,8 +69,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 0 8px 25px;
-            margin-bottom: 20px;
+            padding: 0 3px 22px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .sidebar-brand img {
@@ -78,7 +79,7 @@
             height: 48px;
             object-fit: contain;
             background: white;
-            border-radius: 10px;
+            border-radius: 9px;
             padding: 5px;
         }
 
@@ -90,15 +91,20 @@
         .sidebar-brand p {
             margin-top: 3px;
             font-size: 11px;
-            color: #a7f3d0;
+            color: #ddd6fe;
+        }
+
+        .menu-section {
+            margin-bottom: 19px;
         }
 
         .menu-title {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #a7f3d0;
-            margin: 0 10px 10px;
+            color: #c4b5fd;
+            font-weight: 700;
+            margin: 0 10px 9px;
         }
 
         .menu {
@@ -110,12 +116,12 @@
         .menu a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 11px 12px;
+            gap: 11px;
+            padding: 10px 12px;
             border-radius: 9px;
-            font-size: 14px;
-            color: #ecfdf5;
-            transition: 0.2s;
+            font-size: 13px;
+            color: #f5f3ff;
+            transition: background 0.2s ease, transform 0.2s ease;
         }
 
         .menu a:hover {
@@ -123,42 +129,48 @@
         }
 
         .menu a.active {
-            background: #059669;
+            background: #7c3aed;
             color: white;
             font-weight: 700;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
         }
 
         .menu-icon {
             width: 22px;
+            flex: 0 0 22px;
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .sidebar-bottom {
-            margin-top: auto;
-            padding-top: 20px;
+            padding-top: 3px;
         }
 
         .logout-form {
-            margin-top: 20px;
+            margin-top: 0;
         }
 
         .logout-btn {
             display: block;
             width: 100%;
             border: 1px solid transparent;
-            background: #059669;
+            background: #7c3aed;
             color: white;
-            padding: 11px;
+            padding: 10px 11px;
             border-radius: 9px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
-            transition: background 0.2s ease;
+            transition: background 0.2s ease, transform 0.2s ease;
         }
 
         .logout-btn:hover {
-            background: #047857;
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .logout-btn:active {
+            transform: translateY(0);
         }
 
         /* =========================
@@ -185,11 +197,9 @@
         ========================== */
 
         .topbar {
-
             position: sticky;
             top: 0;
             z-index: 999;
-
             background: white;
             border-bottom: 1px solid #e5e7eb;
             padding: 18px 30px;
@@ -205,7 +215,7 @@
 
         .topbar-left h1 {
             font-size: 22px;
-            color: #064e3b;
+            color: #4c1d95;
         }
 
         .topbar-left p {
@@ -214,20 +224,20 @@
             color: #6b7280;
         }
 
-        .admin-info {
+        .support-info {
             display: flex;
             align-items: center;
             gap: 10px;
             flex-shrink: 0;
         }
 
-        .admin-avatar {
+        .support-avatar {
             width: 40px;
             height: 40px;
             flex: 0 0 40px;
             border-radius: 50%;
-            background: #d1fae5;
-            color: #065f46;
+            background: #ede9fe;
+            color: #5b21b6;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -235,13 +245,13 @@
             font-size: 15px;
         }
 
-        .admin-name {
+        .support-name {
             font-size: 13px;
             font-weight: 700;
             color: #374151;
         }
 
-        .admin-role {
+        .support-role {
             font-size: 11px;
             color: #6b7280;
             margin-top: 2px;
@@ -258,7 +268,7 @@
             flex: 0 0 40px;
             border: none;
             border-radius: 8px;
-            background: #059669;
+            background: #7c3aed;
             color: white;
             font-size: 23px;
             cursor: pointer;
@@ -268,7 +278,7 @@
         }
 
         .menu-toggle:hover {
-            background: #047857;
+            background: #6d28d9;
         }
 
         /* =========================
@@ -407,16 +417,16 @@
                 white-space: nowrap;
             }
 
-            .admin-info {
+            .support-info {
                 width: auto;
                 gap: 0;
             }
 
-            .admin-info > div:last-child {
+            .support-info > div:last-child {
                 display: none;
             }
 
-            .admin-avatar {
+            .support-avatar {
                 width: 35px;
                 height: 35px;
                 flex-basis: 35px;
@@ -434,10 +444,10 @@
 
 <body>
 
-    <div class="layout" id="adminLayout">
+    <div class="layout" id="itSupportLayout">
 
         <!-- SIDEBAR -->
-        <aside class="sidebar" id="adminSidebar">
+        <aside class="sidebar" id="itSupportSidebar">
 
             <div>
 
@@ -449,68 +459,139 @@
 
                     <div>
                         <h1>IT Helpdesk</h1>
-                        <p>Gateway Admin</p>
+                        <p>Gateway IT Support</p>
                     </div>
                 </div>
 
-                <div class="menu-title">
-                    Menu Utama
+                <!-- MENU UTAMA -->
+                <div class="menu-section">
+
+                    <div class="menu-title">
+                        Menu Utama
+                    </div>
+
+                    <nav class="menu">
+
+                        <a
+                            href="{{ route('it-support.dashboard') }}"
+                            class="{{ request()->routeIs('it-support.dashboard') ? 'active' : '' }}"
+                        >
+                            <span class="menu-icon">🏠</span>
+                            <span>Dashboard</span>
+                        </a>
+
+                    </nav>
+
                 </div>
 
-                <nav class="menu">
+                <!-- TIKET -->
+                <div class="menu-section">
 
-                    <a
-                        href="{{ route('admin.dashboard') }}"
-                        class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                    >
-                        <span class="menu-icon">🏠</span>
-                        <span>Dashboard</span>
-                    </a>
+                    <div class="menu-title">
+                        Tiket
+                    </div>
 
-                    <a
-                        href="{{ route('admin.tickets.index') }}"
-                        class="{{ request()->routeIs('admin.tickets.*') ? 'active' : '' }}"
-                    >
-                        <span class="menu-icon">🎫</span>
-                        <span>Monitoring Tiket</span>
-                    </a>
+                    <nav class="menu">
 
-                    <a
-                        href="#"
-                        class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                    >
-                        <span class="menu-icon">👥</span>
-                        <span>User Management</span>
-                    </a>
+                        <a
+                            href="{{ route('it-support.tickets') }}"
+                            class="{{ request()->routeIs('it-support.tickets') && !request()->routeIs('it-support.tickets.history') ? 'active' : '' }}"
+                        >
+                            <span class="menu-icon">🎫</span>
+                            <span>Semua Tiket</span>
+                        </a>
 
-                    <a
-                        href="{{ route('admin.assets.index') }}"
-                        class="{{ request()->routeIs('admin.assets.*') ? 'active' : '' }}"
-                    >
-                        <span class="menu-icon">💻</span>
-                        <span>Asset Management</span>
-                    </a>
+                        <a
+                            href="{{ route('it-support.tickets.history') }}"
+                            class="{{ request()->routeIs('it-support.tickets.history') ? 'active' : '' }}"
+                        >
+                            <span class="menu-icon">📜</span>
+                            <span>Riwayat Tiket</span>
+                        </a>
 
-                   <a
-                        href="{{ route('admin.maintenance.history') }}"
-                        class="{{ request()->routeIs('admin.maintenance.history') ? 'active' : '' }}"
-                    >
-                        <span class="menu-icon">🔧</span>
-                        <span>Riwayat Maintenance</span>
-                    </a>
+                    </nav>
 
-                    <a
-                        href="{{ route('admin.reports.index') }}"
-                        class="{{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"
-                    >
-                        <span class="menu-icon">📊</span>
-                        <span>Reports</span>
-                    </a>
+                </div>
 
-                </nav>
+                <!-- MAINTENANCE -->
+                <div class="menu-section">
+
+                    <div class="menu-title">
+                        Maintenance
+                    </div>
+
+                    <nav class="menu">
+
+                        <a
+                            href="{{ route('it-support.maintenance.pc') }}"
+                            class="{{ request()->routeIs('it-support.maintenance.pc') ? 'active' : '' }}"
+                        >
+                            <span class="menu-icon">💻</span>
+                            <span>PC Maintenance</span>
+                        </a>
+
+                        <a
+                            href="{{ route('it-support.maintenance.server') }}"
+                            class="{{ request()->routeIs('it-support.maintenance.server') ? 'active' : '' }}"
+                        >
+                            <span class="menu-icon">🌐</span>
+                            <span>Internet / Server</span>
+                        </a>
+
+                        <a
+                            href="{{ route('it-support.maintenance.history') }}"
+                            class="{{ request()->routeIs('it-support.maintenance.history') ? 'active' : '' }}"
+                        >
+                            <span class="menu-icon">📋</span>
+                            <span>Riwayat Maintenance</span>
+                        </a>
+
+                    </nav>
+
+                </div>
+
+                <!-- ASET -->
+                <div class="menu-section">
+
+                    <div class="menu-title">
+                        Aset
+                    </div>
+
+                    <nav class="menu">
+
+                        <a
+                            href="{{ route('it-support.assets.index') }}"
+                            class="{{ request()->routeIs('it-support.assets.*') ? 'active' : '' }}"
+                        >
+                            <span class="menu-icon">💻</span>
+                            <span>Aset Gateway</span>
+                        </a>
+
+                    </nav>
+
+                </div>
+
+                <!-- AKUN -->
+                <div class="menu-section">
+
+                    <div class="menu-title">
+                        Akun
+                    </div>
+
+                    <nav class="menu">
+
+                        <a href="#">
+                            <span class="menu-icon">👤</span>
+                            <span>Profil</span>
+                        </a>
+
+                    </nav>
+
+                </div>
 
             </div>
 
+            <!-- LOGOUT -->
             <div class="sidebar-bottom">
 
                 <form
@@ -521,7 +602,7 @@
                     @csrf
 
                     <button type="submit" class="logout-btn">
-                        🚪 Logout
+                        📜 Logout
                     </button>
                 </form>
 
@@ -552,13 +633,13 @@
                         id="menuToggle"
                         aria-label="Buka menu navigasi"
                         aria-expanded="false"
-                        aria-controls="adminSidebar"
+                        aria-controls="itSupportSidebar"
                     >
                         ☰
                     </button>
 
                     <div>
-                        <h1>@yield('page-title', 'Admin')</h1>
+                        <h1>@yield('page-title', 'IT Support')</h1>
 
                         <p>
                             @yield('page-subtitle', 'IT Helpdesk Management System')
@@ -567,19 +648,19 @@
 
                 </div>
 
-                <div class="admin-info">
+                <div class="support-info">
 
-                    <div class="admin-avatar">
-                        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                    <div class="support-avatar">
+                        {{ strtoupper(substr(auth()->user()->name ?? 'I', 0, 1)) }}
                     </div>
 
                     <div>
-                        <div class="admin-name">
-                            {{ auth()->user()->name ?? 'Administrator' }}
+                        <div class="support-name">
+                            {{ auth()->user()->name ?? 'IT Support' }}
                         </div>
 
-                        <div class="admin-role">
-                            Administrator
+                        <div class="support-role">
+                            IT Support
                         </div>
                     </div>
 
@@ -602,7 +683,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            const layout = document.getElementById('adminLayout');
+            const layout = document.getElementById('itSupportLayout');
             const menuToggle = document.getElementById('menuToggle');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
             const sidebarLinks = document.querySelectorAll('.sidebar .menu a');
