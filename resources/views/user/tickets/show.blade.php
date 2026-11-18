@@ -579,6 +579,101 @@
                 0 10px 22px rgba(0, 0, 0, 0.08);
         }
 
+
+        /* =========================
+        TICKET TIMELINE
+        ========================== */
+
+        .timeline {
+            position: relative;
+            margin-top: 10px;
+            padding-left: 8px;
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex;
+            gap: 15px;
+            padding-bottom: 25px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-marker {
+            position: relative;
+            z-index: 1;
+            flex: 0 0 34px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            font-size: 15px;
+            border: 3px solid #f3f4f6;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            left: 16px;
+            top: 34px;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+        .timeline-item.completed .timeline-marker {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .timeline-item.completed:not(:last-child)::after {
+            background: #93c5fd;
+        }
+
+        .timeline-content {
+            flex: 1;
+            min-width: 0;
+            padding-top: 3px;
+        }
+
+        .timeline-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .timeline-description {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .timeline-date {
+            display: inline-block;
+            margin-top: 7px;
+            font-size: 12px;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .timeline-item {
+                gap: 11px;
+            }
+
+            .timeline-title {
+                font-size: 13px;
+            }
+        }
+
+
         /* =========================
            RESOLUTION
         ========================== */
@@ -1136,11 +1231,28 @@
             <div class="info-box">
 
                 <div class="label">
-                    Kategori
+                    Komputer
                 </div>
 
                 <div class="value">
-                    {{ $ticket->category->name ?? '-' }}
+
+                    @if ($ticket->asset)
+
+                        {{ $ticket->asset->asset_code }}
+                        <br>
+
+                        <span style="font-size: 13px; color: #6b7280; font-weight: normal;">
+                            {{ $ticket->asset->name }}
+                        </span>
+
+                    @else
+
+                        <span style="color: #9ca3af; font-weight: normal;">
+                            Tidak ada komputer yang dipilih
+                        </span>
+
+                    @endif
+
                 </div>
 
             </div>
@@ -1339,6 +1451,183 @@
             </div>
 
         </div>
+
+
+{{-- TIMELINE PENANGANAN TIKET --}}
+
+<div class="row">
+
+    <div class="label">
+        Timeline Penanganan
+    </div>
+
+    <div class="description" style="margin-bottom: 16px;">
+        Pantau tahapan laporan dan proses penanganan tiket Anda.
+    </div>
+
+    <div class="timeline">
+
+        {{-- 1. TIKET DILAPORKAN --}}
+        <div class="timeline-item completed">
+
+            <div class="timeline-marker">✓</div>
+
+            <div class="timeline-content">
+
+                <div class="timeline-title">
+                    Tiket Dilaporkan
+                </div>
+
+                <div class="timeline-description">
+                    Laporan masalah berhasil dibuat dan masuk ke sistem IT Helpdesk.
+                </div>
+
+                @if ($ticket->created_at)
+                    <div class="timeline-date">
+                        {{ $ticket->created_at->format('d/m/Y H:i') }}
+                    </div>
+                @endif
+
+            </div>
+
+        </div>
+
+
+        {{-- 2. PRIORITAS DITENTUKAN --}}
+        <div class="timeline-item {{ $ticket->priority ? 'completed' : '' }}">
+
+            <div class="timeline-marker">
+                {{ $ticket->priority ? '✓' : '2' }}
+            </div>
+
+            <div class="timeline-content">
+
+                <div class="timeline-title">
+                    Prioritas Tiket
+                </div>
+
+                <div class="timeline-description">
+
+                    @if ($ticket->priority)
+                        IT Support telah menentukan prioritas
+                        <strong>{{ ucfirst($ticket->priority) }}</strong>.
+                    @else
+                        Tiket masih menunggu penilaian prioritas dari IT Support.
+                    @endif
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- 3. MULAI PENANGANAN --}}
+        <div class="timeline-item {{ $ticket->assigned_at ? 'completed' : '' }}">
+
+            <div class="timeline-marker">
+                {{ $ticket->assigned_at ? '✓' : '3' }}
+            </div>
+
+            <div class="timeline-content">
+
+                <div class="timeline-title">
+                    Penanganan IT Support
+                </div>
+
+                <div class="timeline-description">
+
+                    @if ($ticket->assigned_at)
+                        Tiket mulai ditangani oleh IT Support.
+                    @else
+                        Tiket belum mulai ditangani oleh IT Support.
+                    @endif
+
+                </div>
+
+                @if ($ticket->assigned_at)
+                    <div class="timeline-date">
+                        {{ \Illuminate\Support\Carbon::parse($ticket->assigned_at)->format('d/m/Y H:i') }}
+                    </div>
+                @endif
+
+            </div>
+
+        </div>
+
+
+        {{-- 4. PENANGANAN SELESAI --}}
+        <div class="timeline-item {{ $ticket->resolved_at ? 'completed' : '' }}">
+
+            <div class="timeline-marker">
+                {{ $ticket->resolved_at ? '✓' : '4' }}
+            </div>
+
+            <div class="timeline-content">
+
+                <div class="timeline-title">
+                    Hasil Penanganan
+                </div>
+
+                <div class="timeline-description">
+
+                    @if ($ticket->resolved_at)
+                        IT Support telah menyelesaikan penanganan tiket.
+                    @elseif ($ticket->status === 'in_progress')
+                        IT Support sedang melakukan penanganan terhadap masalah Anda.
+                    @else
+                        Hasil penanganan akan ditampilkan setelah IT Support menyelesaikan pekerjaan.
+                    @endif
+
+                </div>
+
+                @if ($ticket->resolved_at)
+                    <div class="timeline-date">
+                        {{ \Illuminate\Support\Carbon::parse($ticket->resolved_at)->format('d/m/Y H:i') }}
+                    </div>
+                @endif
+
+            </div>
+
+        </div>
+
+
+        {{-- 5. TIKET DITUTUP --}}
+        <div class="timeline-item {{ $ticket->closed_at ? 'completed' : '' }}">
+
+            <div class="timeline-marker">
+                {{ $ticket->closed_at ? '✓' : '5' }}
+            </div>
+
+            <div class="timeline-content">
+
+                <div class="timeline-title">
+                    Konfirmasi Selesai
+                </div>
+
+                <div class="timeline-description">
+
+                    @if ($ticket->closed_at)
+                        Tiket telah dikonfirmasi selesai dan ditutup.
+                    @else
+                        Tiket akan selesai setelah hasil perbaikan dikonfirmasi oleh User.
+                    @endif
+
+                </div>
+
+                @if ($ticket->closed_at)
+                    <div class="timeline-date">
+                        {{ \Illuminate\Support\Carbon::parse($ticket->closed_at)->format('d/m/Y H:i') }}
+                    </div>
+                @endif
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
         @if ($ticket->status === 'resolved' || $ticket->status === 'closed')

@@ -85,10 +85,7 @@
 
         .logout-btn:hover {
             background: #1d4ed8;
-
-            box-shadow:
-                0 5px 10px rgba(37, 99, 235, 0.22),
-                0 10px 20px rgba(37, 99, 235, 0.13);
+            transform: translateY(-2px);
         }
 
         .container {
@@ -371,7 +368,6 @@
     </div>
 
     <div class="user-info">
-
         <div>
             {{ auth()->user()->name }}
         </div>

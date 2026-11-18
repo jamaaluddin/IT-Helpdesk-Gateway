@@ -560,6 +560,8 @@
 
         <!-- DASHBOARD -->
 
+        <div class="menu-title">Menu Utama</div>
+
         <a href="{{ route('it-support.dashboard') }}">
 
             <span class="menu-icon">
@@ -662,7 +664,7 @@
         </div>
 
 
-        <a href="#">
+        <a href="{{ route('it-support.assets.index') }}">
 
             <span class="menu-icon">
                 💻

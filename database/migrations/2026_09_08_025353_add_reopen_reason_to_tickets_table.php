@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tickets', function (Blueprint $table) {
-              $table->text('reopen_reason')->nullable()->after('resolution_notes');
+            $table->text('reopen_reason')
+                ->nullable()
+                ->after('resolution_notes');
         });
     }
 
@@ -22,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tickets', function (Blueprint $table) {
-              $table->dropColumn('reopen_reason');
+            $table->dropColumn('reopen_reason');
         });
     }
 };

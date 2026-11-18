@@ -12,45 +12,45 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('assets', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->foreignId('asset_type_id')
-        ->constrained('asset_types');
+            $table->foreignId('asset_type_id')
+                ->constrained('asset_types');
 
-    $table->foreignId('office_id')
-        ->constrained('offices');
+            $table->foreignId('office_id')
+                ->constrained('offices');
 
-    $table->foreignId('department_id')
-        ->nullable()
-        ->constrained('departments')
-        ->nullOnDelete();
+            $table->foreignId('department_id')
+                ->nullable()
+                ->constrained('departments')
+                ->nullOnDelete();
 
-    $table->string('asset_code')->unique();
-    $table->string('name');
-    $table->string('brand')->nullable();
-    $table->string('model')->nullable();
-    $table->string('serial_number')->nullable()->unique();
+            $table->string('asset_code')->unique();
+            $table->string('name');
+            $table->string('brand')->nullable();
+            $table->string('model')->nullable();
+            $table->string('serial_number')->nullable()->unique();
 
-    $table->enum('condition', [
-        'good',
-        'minor_damage',
-        'major_damage',
-        'broken'
-    ])->default('good');
+            $table->enum('condition', [
+                'good',
+                'minor_damage',
+                'major_damage',
+                'broken',
+            ])->default('good');
 
-    $table->enum('status', [
-        'available',
-        'in_use',
-        'maintenance',
-        'damaged',
-        'retired'
-    ])->default('available');
+            $table->enum('status', [
+                'available',
+                'in_use',
+                'maintenance',
+                'damaged',
+                'retired',
+            ])->default('available');
 
-    $table->date('purchase_date')->nullable();
-    $table->text('notes')->nullable();
+            $table->date('purchase_date')->nullable();
+            $table->text('notes')->nullable();
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

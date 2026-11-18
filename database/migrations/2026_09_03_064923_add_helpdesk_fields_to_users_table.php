@@ -12,15 +12,29 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('role_id')->after('id')->constrained('roles');
-            $table->foreignId('office_id')->after('role_id')->constrained('offices');
-            $table->foreignId('department_id')->after('office_id')->constrained('departments');
+            $table->foreignId('role_id')
+                ->after('id')
+                ->constrained('roles');
 
-            $table->string('phone')->nullable()->after('email');
+            $table->foreignId('office_id')
+                ->after('role_id')
+                ->constrained('offices');
+
+            $table->foreignId('department_id')
+                ->after('office_id')
+                ->constrained('departments');
+
+            $table->string('phone')
+                ->nullable()
+                ->after('email');
+
             $table->enum('status', ['pending', 'active', 'rejected'])
                 ->default('pending')
                 ->after('password');
-            $table->timestamp('approved_at')->nullable()->after('status');
+
+            $table->timestamp('approved_at')
+                ->nullable()
+                ->after('status');
         });
     }
 

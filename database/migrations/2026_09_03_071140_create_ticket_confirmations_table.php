@@ -11,25 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('ticket_confirmations', function (Blueprint $table) {
-    $table->id();
+        Schema::create('ticket_confirmations', function (Blueprint $table) {
+            $table->id();
 
-    $table->foreignId('ticket_id')
-        ->constrained('tickets')
-        ->cascadeOnDelete();
+            $table->foreignId('ticket_id')
+                ->constrained('tickets')
+                ->cascadeOnDelete();
 
-    $table->foreignId('user_id')
-        ->constrained('users');
+            $table->foreignId('user_id')
+                ->constrained('users');
 
-    $table->enum('confirmation', [
-        'effective',
-        'not_effective'
-    ]);
+            $table->enum('confirmation', [
+                'effective',
+                'not_effective',
+            ]);
 
-    $table->text('notes')->nullable();
+            $table->text('notes')->nullable();
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

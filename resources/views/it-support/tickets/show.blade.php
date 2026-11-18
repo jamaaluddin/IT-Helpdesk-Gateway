@@ -1072,6 +1072,37 @@
 
             </div>
 
+            {{-- KOMPUTER --}}
+            <div class="info-box">
+
+                <div class="label">
+                    Komputer
+                </div>
+
+                <div class="value">
+
+                    @if ($ticket->asset)
+
+                        {{ $ticket->asset->asset_code }}
+
+                        <br>
+
+                        <span style="font-size: 13px; color: #6b7280; font-weight: normal;">
+                            {{ $ticket->asset->name }}
+                        </span>
+
+                    @else
+
+                        <span style="color: #9ca3af; font-weight: normal;">
+                            Tidak ada komputer yang dipilih
+                        </span>
+
+                    @endif
+
+                </div>
+
+            </div>
+
 
             {{-- CABANG --}}
             <div class="info-box">
@@ -1141,70 +1172,84 @@
             @endif
 
 
+
             {{-- PRIORITAS --}}
-            <div class="info-box">
+                <div class="info-box">
 
-                <div class="label">
-                    Prioritas
-                </div>
+                        <div class="label">
+                            Prioritas
+                        </div>
 
-                <div class="value">
+                    <div class="value">
 
-                    @if (
-                        $ticket->assigned_to === auth()->id() &&
-                        in_array($ticket->status, ['assigned', 'in_progress'])
-                    )
+                    @php
+
+                        $isPendingPriority =
+                        $ticket->status === 'open'
+                        && $ticket->assigned_to === null
+                        && $ticket->priority === null;
+
+                        $isOwnedTicket =
+                            in_array($ticket->status, ['assigned', 'in_progress'])
+                            && (int) $ticket->assigned_to === (int) auth()->id();
+                    @endphp
+
+                    @if ($isPendingPriority || $isOwnedTicket)
 
                         <form
                             action="{{ route('it-support.tickets.priority', $ticket) }}"
                             method="POST"
-                        >
-
-                            @csrf
-
-                            <select
-                                name="priority"
-                                onchange="this.form.submit()"
-                                style="
-                                    width: 100%;
-                                    padding: 10px 12px;
-                                    border: 1px solid #ddd6fe;
-                                    border-radius: 9px;
-                                    background: #faf9ff;
-                                    color: #374151;
-                                    font-size: 13px;
-                                    font-weight: 600;
-                                    outline: none;
-                                    cursor: pointer;
-                                "
                             >
 
-                                <option value="" disabled
-                                    {{ $ticket->priority === null ? 'selected' : '' }}>
-                                    Belum Ditentukan
-                                </option>
+                    @csrf
 
-                                <option value="low"
-                                    {{ $ticket->priority === 'low' ? 'selected' : '' }}>
-                                    Low - Tidak mendesak
-                                </option>
+                        <select
+                            name="priority"
+                            required
+                            style=
+                                "width: 100%;
+                                padding: 10px 12px;
+                                border: 1px solid #ddd6fe;
+                                border-radius: 9px;
+                                background: #faf9ff;
+                                color: #374151;
+                                font-size: 13px;
+                                font-weight: 600;
+                                outline: none;
+                                cursor: pointer;">
 
-                                <option value="medium"
-                                    {{ $ticket->priority === 'medium' ? 'selected' : '' }}>
-                                    Medium - Normal
-                                </option>
+                            <option value="" disabled
+                            {{ $ticket->priority === null ? 'selected' : '' }}>
+                                Pilih Prioritas
+                            </option>
 
-                                <option value="high"
-                                    {{ $ticket->priority === 'high' ? 'selected' : '' }}>
-                                    High - Mengganggu pekerjaan
-                                </option>
+                            <option value="low"
+                            {{ $ticket->priority === 'low' ? 'selected' : '' }}>
+                                Low - Tidak mendesak
+                            </option>
 
-                                <option value="critical"
-                                    {{ $ticket->priority === 'critical' ? 'selected' : '' }}>
-                                    Critical - Pekerjaan terhenti
-                                </option>
+                            <option value="medium"
+                            {{ $ticket->priority === 'medium' ? 'selected' : '' }}>
+                                Medium - Normal
+                            </option>
 
-                            </select>
+                            <option value="high"
+                            {{ $ticket->priority === 'high' ? 'selected' : '' }}>
+                                High - Mengganggu pekerjaan
+                            </option>
+
+                            <option value="critical"
+                            {{ $ticket->priority === 'critical' ? 'selected' : '' }}>
+                                Critical - Pekerjaan terhenti
+                            </option>
+                        </select>
+
+                        <button
+                            type="submit"
+                            class="action-btn"
+                        >
+                            Simpan Penilaian Prioritas
+                        </button>
 
                         </form>
 
@@ -1225,9 +1270,10 @@
 
                     @endif
 
+                    </div>
+
                 </div>
 
-            </div>
 
 
             {{-- STATUS --}}
@@ -1443,31 +1489,8 @@
             </div>
 
 
-            {{-- AMBIL TIKET --}}
-            @if ($ticket->status === 'open')
-
-                <form
-                    action="{{ route('it-support.tickets.take', $ticket) }}"
-                    method="POST"
-                    style="display: inline;"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="action-btn"
-                    >
-                        🔧 Ambil Tiket
-                    </button>
-
-                </form>
-
-            @endif
-
-
             {{-- MULAI MENANGANI --}}
-            @if ($ticket->status === 'assigned')
+            @if (in_array($ticket->status, ['open', 'assigned']) && $ticket->priority !== null)
 
                 <form
                     action="{{ route('it-support.tickets.start', $ticket) }}"

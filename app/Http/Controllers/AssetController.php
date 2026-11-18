@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\AssetType;
 use App\Models\Office;
 use App\Models\Department;
+use App\Models\AssetHistory;
 use Illuminate\Http\Request;
 
 class AssetController extends Controller
@@ -98,7 +99,17 @@ class AssetController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        Asset::create($validated);
+        $asset = Asset::create($validated);
+
+        AssetHistory::create([
+            'asset_id' => $asset->id,
+            'user_id' => auth()->id(),
+            'office_id' => $asset->office_id,
+            'action' => 'created',
+            'description' => 'Aset baru ditambahkan ke sistem.',
+            'condition' => $asset->condition,
+            'action_date' => now()->toDateString(),
+        ]);
 
         return redirect()
             ->route('admin.assets.index')
@@ -131,20 +142,41 @@ class AssetController extends Controller
 
         $asset->update($validated);
 
+        AssetHistory::create([
+            'asset_id' => $asset->id,
+            'user_id' => auth()->id(),
+            'office_id' => $asset->office_id,
+            'action' => 'updated',
+            'description' => 'Data aset diperbarui oleh Admin.',
+            'condition' => $asset->condition,
+            'action_date' => now()->toDateString(),
+        ]);
+
         return redirect()
             ->route('admin.assets.show', $asset)
             ->with('success', 'Data aset berhasil diperbarui.');
     }
 
-    public function retire(Asset $asset)
-    {
-        $asset->update([
-            'status' => 'retired',
-        ]);
+   public function retire(Asset $asset)
 
-        return redirect()
-            ->route('admin.assets.show', $asset)
-            ->with('success', 'Aset berhasil dipensiunkan.');
+   {
+    $asset->update([
+        'status' => 'retired',
+    ]);
+
+    AssetHistory::create([
+        'asset_id' => $asset->id,
+        'user_id' => auth()->id(),
+        'office_id' => $asset->office_id,
+        'action' => 'retired',
+        'description' => 'Aset dipensiunkan oleh Admin.',
+        'condition' => $asset->condition,
+        'action_date' => now()->toDateString(),
+    ]);
+
+    return redirect()
+        ->route('admin.assets.show', $asset)
+        ->with('success', 'Aset berhasil dipensiunkan.');
     }
 
     public function destroy(Asset $asset)

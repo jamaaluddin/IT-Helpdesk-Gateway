@@ -12,33 +12,33 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('maintenance_schedules', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->foreignId('asset_id')
-        ->constrained('assets')
-        ->cascadeOnDelete();
+            $table->foreignId('asset_id')
+                ->constrained('assets')
+                ->cascadeOnDelete();
 
-    $table->foreignId('office_id')
-        ->constrained('offices');
+            $table->foreignId('office_id')
+                ->constrained('offices');
 
-    $table->foreignId('scheduled_by')
-        ->constrained('users');
+            $table->foreignId('scheduled_by')
+                ->constrained('users');
 
-    $table->date('scheduled_date');
-    $table->date('actual_date')->nullable();
+            $table->date('scheduled_date');
+            $table->date('actual_date')->nullable();
 
-    $table->enum('status', [
-        'scheduled',
-        'completed',
-        'cancelled',
-        'rescheduled'
-    ])->default('scheduled');
+            $table->enum('status', [
+                'scheduled',
+                'completed',
+                'cancelled',
+                'rescheduled',
+            ])->default('scheduled');
 
-    $table->text('result')->nullable();
-    $table->text('remarks')->nullable();
+            $table->text('result')->nullable();
+            $table->text('remarks')->nullable();
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

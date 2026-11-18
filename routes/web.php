@@ -13,6 +13,8 @@ use App\Http\Controllers\MaintenanceScheduleController;
 use App\Http\Controllers\ItSupportMaintenanceController;
 use App\Http\Controllers\MaintenanceHistoryController;
 use App\Http\Controllers\ServerMaintenanceController;
+use App\Http\Controllers\AssetTypeController;
+use App\Http\Controllers\ITSupportAssetController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,13 +36,13 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
     ->middleware('admin')
     ->name('admin.dashboard');
 
-Route::get('/admin/maintenance/schedules', [MaintenanceScheduleController::class, 'index'])
+Route::get('/admin/tickets', [AdminController::class, 'tickets'])
     ->middleware('admin')
-    ->name('admin.maintenance.schedules.index');
+    ->name('admin.tickets.index');
 
-Route::get('/admin/maintenance/schedules/{maintenanceSchedule}', [MaintenanceScheduleController::class, 'show'])
+Route::get('/admin/maintenance/history', [MaintenanceHistoryController::class, 'adminHistory'])
     ->middleware('admin')
-    ->name('admin.maintenance.schedules.show');
+    ->name('admin.maintenance.history');
 
 Route::get('/admin/assets', [AssetController::class, 'index'])
     ->middleware('admin')
@@ -74,13 +76,61 @@ Route::delete('/admin/assets/{asset}', [AssetController::class, 'destroy'])
     ->middleware('admin')
     ->name('admin.assets.destroy');
 
-Route::get('/user/dashboard', [UserController::class, 'dashboard'])
-    ->middleware(['auth', 'role:User'])
-    ->name('user.dashboard');
+Route::get('/admin/asset-types', [AssetTypeController::class, 'index'])
+    ->middleware('admin')
+    ->name('admin.asset-types.index');
+
+Route::post('/admin/asset-types', [AssetTypeController::class, 'store'])
+    ->middleware('admin')
+    ->name('admin.asset-types.store');
+
+Route::put('/admin/asset-types/{assetType}', [AssetTypeController::class, 'update'])
+    ->middleware('admin')
+    ->name('admin.asset-types.update');
+
+Route::patch('/admin/asset-types/{assetType}/toggle-status', [AssetTypeController::class, 'toggleStatus'])
+    ->middleware('admin')
+    ->name('admin.asset-types.toggle-status');
+
+Route::get('/admin/reports', [AdminController::class, 'report'])
+    ->middleware('admin')
+    ->name('admin.reports.index');
 
 Route::get('/it-support/dashboard', [ITSupportController::class, 'dashboard'])
     ->middleware(['auth', 'role:IT Support'])
     ->name('it-support.dashboard');
+
+Route::get('/it-support/assets', [ITSupportAssetController::class, 'index'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.assets.index');
+
+Route::get('/it-support/assets/create', [ITSupportAssetController::class, 'create'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.assets.create');
+
+Route::post('/it-support/assets', [ITSupportAssetController::class, 'store'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.assets.store');
+
+Route::get('/it-support/assets/{asset}/edit', [ITSupportAssetController::class, 'edit'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.assets.edit');
+
+Route::get('/it-support/assets/{asset}/history', [ITSupportAssetController::class, 'history'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.assets.history');
+
+Route::put('/it-support/assets/{asset}', [ITSupportAssetController::class, 'update'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.assets.update');
+
+Route::get('/it-support/assets/{asset}/detail', [ITSupportAssetController::class, 'show'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.assets.show');
+
+Route::get('/it-support/assets/{assetType}', [ITSupportAssetController::class, 'category'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.assets.category');
 
 Route::get('/it-support/maintenance/pc', [ItSupportMaintenanceController::class, 'index'])
     ->middleware(['auth', 'role:IT Support'])
@@ -149,6 +199,10 @@ Route::post('/it-support/tickets/{ticket}/priority', [ITSupportController::class
 Route::post('/it-support/tickets/{ticket}/resolve', [ITSupportController::class, 'resolve'])
     ->middleware(['auth', 'role:IT Support'])
     ->name('it-support.tickets.resolve');
+
+Route::get('/user/dashboard', [UserController::class, 'dashboard'])
+    ->middleware(['auth', 'role:User'])
+    ->name('user.dashboard');
 
 Route::get('/user/tickets/create', [TicketController::class, 'create'])
     ->middleware(['auth', 'role:User'])

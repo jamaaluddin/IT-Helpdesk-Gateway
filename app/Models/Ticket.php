@@ -14,10 +14,13 @@ class Ticket extends Model
 
     protected $fillable = [
         'ticket_number',
+        'queue_number',
+        'queue_date',
         'user_id',
         'office_id',
         'department_id',
         'category_id',
+        'asset_id',
         'subject',
         'description',
         'problem_image',
@@ -55,6 +58,11 @@ class Ticket extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    public function asset(): BelongsTo
+    {
+        return $this->belongsTo(Asset::class, 'asset_id');
     }
 
 }

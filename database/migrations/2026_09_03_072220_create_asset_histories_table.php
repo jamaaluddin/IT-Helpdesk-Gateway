@@ -10,38 +10,39 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {Schema::create('asset_histories', function (Blueprint $table) {
-    $table->id();
+    {
+        Schema::create('asset_histories', function (Blueprint $table) {
+            $table->id();
 
-    $table->foreignId('asset_id')
-        ->constrained('assets')
-        ->cascadeOnDelete();
+            $table->foreignId('asset_id')
+                ->constrained('assets')
+                ->cascadeOnDelete();
 
-    $table->foreignId('user_id')
-        ->nullable()
-        ->constrained('users')
-        ->nullOnDelete();
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
 
-    $table->foreignId('office_id')
-        ->nullable()
-        ->constrained('offices')
-        ->nullOnDelete();
+            $table->foreignId('office_id')
+                ->nullable()
+                ->constrained('offices')
+                ->nullOnDelete();
 
-    $table->string('action');
+            $table->string('action');
 
-    $table->text('description')->nullable();
+            $table->text('description')->nullable();
 
-    $table->enum('condition', [
-        'good',
-        'minor_damage',
-        'major_damage',
-        'broken'
-    ])->nullable();
+            $table->enum('condition', [
+                'good',
+                'minor_damage',
+                'major_damage',
+                'broken',
+            ])->nullable();
 
-    $table->date('action_date');
+            $table->date('action_date');
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

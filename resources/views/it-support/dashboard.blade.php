@@ -809,6 +809,8 @@
 
             <!-- DASHBOARD -->
 
+            <div class="menu-title">Menu Utama</div>
+
             <a
                 href="{{ route('it-support.dashboard') }}"
                 class="active"
@@ -869,10 +871,11 @@
             </div>
 
 
-            <a href="#">
+           <a href="{{ route('it-support.assets.index') }}"
+                class="{{ request()->routeIs('it-support.assets.*') ? 'active' : '' }}">
                 <span class="menu-icon">💻</span>
                 <span>Aset Gateway</span>
-            </a>
+           </a>
 
 
             <!-- AKUN -->

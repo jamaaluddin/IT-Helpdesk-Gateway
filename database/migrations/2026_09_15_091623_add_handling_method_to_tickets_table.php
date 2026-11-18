@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('tickets', function (Blueprint $table) {
             $table->enum('handling_method', [
                 'in_person',
-                'remote'
+                'remote',
             ])->nullable()->after('priority');
         });
     }

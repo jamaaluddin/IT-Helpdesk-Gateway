@@ -11,25 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('attachments', function (Blueprint $table) {
-    $table->id();
+        Schema::create('attachments', function (Blueprint $table) {
+            $table->id();
 
-    $table->foreignId('ticket_id')
-        ->constrained('tickets')
-        ->cascadeOnDelete();
+            $table->foreignId('ticket_id')
+                ->constrained('tickets')
+                ->cascadeOnDelete();
 
-    $table->foreignId('uploaded_by')
-        ->constrained('users');
+            $table->foreignId('uploaded_by')
+                ->constrained('users');
 
-    $table->string('file_name');
-    $table->string('file_path');
-    $table->string('file_type')->nullable();
-    $table->unsignedBigInteger('file_size')->nullable();
+            $table->string('file_name');
+            $table->string('file_path');
+            $table->string('file_type')->nullable();
+            $table->unsignedBigInteger('file_size')->nullable();
 
-    $table->text('description')->nullable();
+            $table->text('description')->nullable();
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

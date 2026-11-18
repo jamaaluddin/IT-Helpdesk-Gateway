@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Ticket;
 use App\Models\TicketCategory;
+use App\Models\Asset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class TicketController extends Controller
 {
@@ -13,12 +16,21 @@ class TicketController extends Controller
     {
         $categories = TicketCategory::where('is_active', true)->get();
 
-        return view('user.tickets.create', compact('categories'));
+        $computers = Asset::where('asset_type_id', 1)
+            ->where('status', '!=', 'retired')
+            ->orderBy('asset_code')
+            ->get(['id', 'asset_code', 'name']);
+
+        return view('user.tickets.create', compact(
+            'categories',
+            'computers'
+       ));
     }
 
-    public function index()
+   public function index()
     {
         $tickets = Ticket::where('user_id', auth()->id())
+            ->where('status', '!=', 'closed')
             ->with('category')
             ->latest()
             ->get();
@@ -33,7 +45,12 @@ class TicketController extends Controller
             abort(403);
         }
 
-        $ticket->load(['category', 'office', 'department']);
+        $ticket->load([
+            'category',
+            'office',
+            'department',
+            'asset'
+        ]);
 
         return view('user.tickets.show', compact('ticket'));
     }
@@ -44,6 +61,14 @@ class TicketController extends Controller
         $request->validate([
             'subject' => 'required|string|max:255',
             'category_id' => 'required|exists:ticket_categories,id',
+            'asset_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('assets', 'id')->where(function ($query) {
+                    $query->where('asset_type_id', 1)
+                    ->where('status', '!=', 'retired');
+                }),
+            ],
             'description' => 'required|string',
             'problem_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
 
@@ -52,7 +77,6 @@ class TicketController extends Controller
             'remote_address' => 'nullable|string|max:255',
             'remote_password' => 'nullable|string|max:255',
         ]);
-
         /*
         |--------------------------------------------------------------------------
         | Cek kategori
@@ -123,162 +147,285 @@ class TicketController extends Controller
         |--------------------------------------------------------------------------
         */
 
+
         $ticket = DB::transaction(function () use (
             $request,
             $problemImagePath,
             $isOtherCategory
-        ) {
+            )
+        {
             $today = now()->toDateString();
 
-            /*
-             * Buat record sequence untuk hari ini jika belum ada.
-             */
-            DB::table('ticket_sequences')->insertOrIgnore([
-                'sequence_date' => $today,
-                'last_number' => 0,
-                'created_at' => now(),
+        /*
+        |--------------------------------------------------------------------------
+        | Buat sequence harian jika belum ada
+        |--------------------------------------------------------------------------
+        */
+
+        DB::table('ticket_sequences')->insertOrIgnore([
+            'sequence_date' => $today,
+            'last_number' => 0,
+            'last_queue_number' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+            ]);
+
+       /*
+       |--------------------------------------------------------------------------
+       | Kunci sequence hari ini
+       |--------------------------------------------------------------------------
+       */
+
+        $sequence = DB::table('ticket_sequences')
+            ->where('sequence_date', $today)
+            ->lockForUpdate()
+            ->first();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Nomor tiket permanen
+        |--------------------------------------------------------------------------
+        */
+
+        $nextNumber = $sequence->last_number + 1;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Nomor antrian harian
+        |--------------------------------------------------------------------------
+        */
+
+        $nextQueueNumber = $sequence->last_queue_number + 1;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Simpan kedua penghitung
+        |--------------------------------------------------------------------------
+        */
+
+        DB::table('ticket_sequences')
+           ->where('sequence_date', $today)
+           ->update([
+                'last_number' => $nextNumber,
+                'last_queue_number' => $nextQueueNumber,
                 'updated_at' => now(),
             ]);
 
-            /*
-             * Lock sequence hari ini agar dua user yang
-             * membuat tiket bersamaan tidak mendapatkan
-             * nomor yang sama.
-             */
-            $sequence = DB::table('ticket_sequences')
-                ->where('sequence_date', $today)
-                ->lockForUpdate()
-                ->first();
+        /*
+        |--------------------------------------------------------------------------
+        | Format nomor
+        |--------------------------------------------------------------------------
+        */
 
-            /*
-             * Tambahkan nomor tiket.
-             */
-            $nextNumber = $sequence->last_number + 1;
+        $ticketNumber = 'TKT-' . now()->format('Ymd') . str_pad(
+            $nextNumber,
+            4,'0',
+            STR_PAD_LEFT
+        );
 
-            /*
-             * Simpan nomor terakhir.
-             */
-            DB::table('ticket_sequences')
-                ->where('sequence_date', $today)
-                ->update([
-                    'last_number' => $nextNumber,
-                    'updated_at' => now(),
-                ]);
+        /*
+        |--------------------------------------------------------------------------
+        | Buat tiket
+        |--------------------------------------------------------------------------
+        */
 
-            /*
-             * Buat nomor tiket.
-             */
-            $ticketNumber = 'TKT-' . now()->format('Ymd') . str_pad(
-                $nextNumber,
-                4,
-                '0',
-                STR_PAD_LEFT
-            );
+        return Ticket::create([
+            'ticket_number' => $ticketNumber,
 
-            /*
-             * Buat tiket.
-             */
-            return Ticket::create([
-                'ticket_number' => $ticketNumber,
+            'queue_number' => $nextQueueNumber,
+            'queue_date' => $today,
 
-                'user_id' => auth()->id(),
-                'office_id' => auth()->user()->office_id,
-                'department_id' => auth()->user()->department_id,
+            'user_id' => auth()->id(),
+            'office_id' => auth()->user()->office_id,
+            'department_id' => auth()->user()->department_id,
 
-                'category_id' => $request->category_id,
-                'subject' => $request->subject,
-                'description' => $request->description,
-                'problem_image' => $problemImagePath,
+            'category_id' => $request->category_id,
+            'asset_id' => $request->asset_id,
+            'subject' => $request->subject,
+            'description' => $request->description,
+            'problem_image' => $problemImagePath,
 
-                // Priority tetap ditentukan oleh IT Support
-                'priority' => null,
+            'priority' => null,
 
-                /*
-                 * Handling method hanya disimpan
-                 * jika kategori adalah Lainnya.
-                 */
-                'handling_method' => $isOtherCategory
-                    ? $request->handling_method
-                    : null,
+            'handling_method' => $isOtherCategory
+                ? $request->handling_method
+                : null,
 
-                /*
-                 * Data Remote hanya disimpan
-                 * jika metode yang dipilih adalah Remote.
-                 */
-                'remote_application' => (
-                    $isOtherCategory &&
-                    $request->handling_method === 'remote'
-                )
-                    ? $request->remote_application
-                    : null,
+            'remote_application' => (
+                $isOtherCategory &&
+                $request->handling_method === 'remote'
+            )
+                ? $request->remote_application
+                : null,
 
-                'remote_address' => (
-                    $isOtherCategory &&
-                    $request->handling_method === 'remote'
-                )
-                    ? $request->remote_address
-                    : null,
+            'remote_address' => (
+                $isOtherCategory &&
+                $request->handling_method === 'remote'
+            )
+                ? $request->remote_address
+                : null,
 
-                'remote_password' => (
-                    $isOtherCategory &&
-                    $request->handling_method === 'remote'
-                )
-                    ? $request->remote_password
-                    : null,
+            'remote_password' => (
+                $isOtherCategory &&
+                $request->handling_method === 'remote'
+            )
+                ? $request->remote_password
+                : null,
 
-                'status' => 'open',
-            ]);
-        });
+            'status' => 'open',
+        ]);
+    });
 
         return redirect()
             ->route('user.dashboard')
             ->with('success', 'Tiket berhasil dibuat.');
     }
 
-    public function close(Ticket $ticket)
+
+
+    private function isConfirmationExpired(Ticket $ticket): bool
     {
-        if ($ticket->user_id !== auth()->id()) {
-            abort(403);
+        if (!$ticket->resolved_at) {
+            return false;
         }
 
-        if ($ticket->status !== 'resolved') {
-            abort(403);
+        $deadline = Carbon::parse($ticket->resolved_at);
+
+        $workingDays = 0;
+
+        while ($workingDays < 3) {
+            $deadline->addDay();
+
+            if (!$deadline->isWeekend()) {
+                $workingDays++;
+            }
         }
 
-        $ticket->update([
-            'status' => 'closed',
-            'closed_at' => now(),
-        ]);
+        return now()->greaterThanOrEqualTo($deadline);
+    }
+
+
+
+    public function close(Request $request, Ticket $ticket)
+    {
+        $result = DB::transaction(function () use ($ticket) {
+
+            $currentTicket = Ticket::whereKey($ticket->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($currentTicket->user_id != auth()->id()) {
+                abort(403);
+            }
+
+            if ($currentTicket->status !== 'resolved') {
+                abort(403);
+            }
+
+            // Periksa apakah batas konfirmasi sudah lewat
+            if ($this->isConfirmationExpired($currentTicket)) {
+
+                $currentTicket->update([
+                    'status' => 'closed',
+                    'closed_at' => now(),
+                ]);
+
+                return 'expired';
+            }
+
+            // Simpan konfirmasi berhasil
+            DB::table('ticket_confirmations')->insert([
+                'ticket_id' => $currentTicket->id,
+                'user_id' => auth()->id(),
+                'confirmation' => 'effective',
+                'notes' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $currentTicket->update([
+                'status' => 'closed',
+                'closed_at' => now(),
+            ]);
+
+            return 'success';
+        });
+
+        if ($result === 'expired') {
+            return redirect()
+                ->route('tickets.show', $ticket)
+                ->with('success', 'Batas konfirmasi telah berakhir. Tiket ditutup otomatis.');
+        }
 
         return redirect()
             ->route('tickets.show', $ticket)
-            ->with('success', 'Tiket berhasil ditutup.');
+            ->with('success', 'Tiket berhasil dikonfirmasi dan ditutup.');
     }
+
 
     public function reopen(Request $request, Ticket $ticket)
     {
-        if ($ticket->user_id != auth()->id()) {
-            abort(403);
+        $result = DB::transaction(function () use ($request, $ticket) {
+
+            $currentTicket = Ticket::whereKey($ticket->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($currentTicket->user_id != auth()->id()) {
+                abort(403);
+            }
+
+            if ($currentTicket->status !== 'resolved') {
+                abort(403);
+            }
+
+            // Periksa tenggat sebelum menerima alasan perbaikan ulang
+            if ($this->isConfirmationExpired($currentTicket)) {
+
+                $currentTicket->update([
+                    'status' => 'closed',
+                    'closed_at' => now(),
+                ]);
+
+                return 'expired';
+            }
+
+            $request->validate([
+                'reopen_reason' => 'required|string|max:1000',
+            ]);
+
+            // Simpan konfirmasi tidak berhasil
+            DB::table('ticket_confirmations')->insert([
+                'ticket_id' => $currentTicket->id,
+                'user_id' => auth()->id(),
+                'confirmation' => 'not_effective',
+                'notes' => $request->reopen_reason,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Kembalikan tiket untuk perbaikan ulang
+            $currentTicket->update([
+                'status' => 'in_progress',
+                'reopen_reason' => $request->reopen_reason,
+                'resolution_notes' => null,
+                'evidence' => null,
+                'resolved_at' => null,
+            ]);
+
+            return 'reopened';
+        });
+
+        if ($result === 'expired') {
+            return redirect()
+                ->route('tickets.show', $ticket)
+                ->with('success', 'Batas konfirmasi telah berakhir. Tiket ditutup otomatis.');
         }
-
-        if ($ticket->status !== 'resolved') {
-            abort(403);
-        }
-
-        $request->validate([
-            'reopen_reason' => 'required|string|max:1000',
-        ]);
-
-        $ticket->update([
-            'status' => 'in_progress',
-            'reopen_reason' => $request->reopen_reason,
-            'resolution_notes' => null,
-            'evidence' => null,
-            'resolved_at' => null,
-        ]);
 
         return redirect()
             ->route('tickets.show', $ticket)
             ->with('success', 'Tiket dikembalikan untuk perbaikan ulang.');
     }
+
+
 }

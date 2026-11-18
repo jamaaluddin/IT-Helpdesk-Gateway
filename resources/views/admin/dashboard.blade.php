@@ -1,1007 +1,730 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.admin')
 
-    <title>Dashboard Admin - IT Helpdesk Gateway</title>
+@section('title', 'Dashboard Admin - IT Helpdesk Gateway')
+@section('page-title', 'Dashboard Admin')
+@section('page-subtitle', 'IT Helpdesk Management System')
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+@php
+    use Illuminate\Support\Facades\DB;
+    use Illuminate\Support\Facades\Schema;
+
+    // Statistik tiket dari AdminController
+    $totalTickets = $totalTickets ?? 0;
+    $openTickets = $openTickets ?? 0;
+    $inProgressTickets = $inProgressTickets ?? 0;
+    $resolvedTickets = $resolvedTickets ?? 0;
+    $closedTickets = $closedTickets ?? 0;
+
+    // Mengambil 5 aktivitas tiket terbaru
+    $latestTickets = \App\Models\Ticket::latest()
+        ->take(5)
+        ->get();
+
+    // Ringkasan aset dan maintenance
+    $totalAssets = Schema::hasTable('assets')
+        ? DB::table('assets')->count()
+        : 0;
+
+    $totalMaintenanceSchedules = Schema::hasTable('maintenance_schedules')
+        ? DB::table('maintenance_schedules')->count()
+        : 0;
+
+    $totalServerMaintenance = Schema::hasTable('server_maintenance')
+        ? DB::table('server_maintenance')->count()
+        : 0;
+
+    // Persentase grafik tiket
+    $chartTotal = max((int) $totalTickets, 1);
+
+    $openPercent = round(($openTickets / $chartTotal) * 100, 1);
+    $progressPercent = round(($inProgressTickets / $chartTotal) * 100, 1);
+    $resolvedPercent = round(($resolvedTickets / $chartTotal) * 100, 1);
+    $closedPercent = round(($closedTickets / $chartTotal) * 100, 1);
+@endphp
+
+<style>
+    .dashboard-content {
+        width: 100%;
+    }
+
+    .welcome {
+        margin-bottom: 25px;
+    }
+
+    .welcome h2 {
+        color: #1f2937;
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 7px;
+    }
+
+    .welcome p {
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* Statistik Tiket */
+
+    .ticket-stats {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        min-width: 0;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .07);
+    }
+
+    .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 17px;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        flex-shrink: 0;
+    }
+
+    .icon-green {
+        color: #059669;
+        background: #d1fae5;
+    }
+
+    .icon-orange {
+        color: #d97706;
+        background: #fef3c7;
+    }
+
+    .icon-blue {
+        color: #2563eb;
+        background: #dbeafe;
+    }
+
+    .icon-purple {
+        color: #7c3aed;
+        background: #ede9fe;
+    }
+
+    .icon-gray {
+        color: #4b5563;
+        background: #f3f4f6;
+    }
+
+    .stat-number {
+        color: #111827;
+        font-size: 29px;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 7px;
+    }
+
+    .stat-footer {
+        color: #9ca3af;
+        font-size: 12px;
+    }
+
+    /* Section */
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .section {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 22px;
+        min-width: 0;
+        margin-bottom: 25px;
+    }
+
+    .dashboard-grid .section {
+        margin-bottom: 0;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .section-header h3 {
+        color: #1f2937;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .section-description {
+        color: #9ca3af;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    /* Grafik Status Tiket */
+
+    .chart-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .chart-item {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .chart-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+    }
+
+    .chart-name {
+        color: #4b5563;
+        font-weight: 600;
+    }
+
+    .chart-value {
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .chart-track {
+        width: 100%;
+        height: 10px;
+        background: #f3f4f6;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .chart-bar {
+        height: 100%;
+        border-radius: 20px;
+        transition: width .4s ease;
+    }
+
+    .bar-open {
+        background: #f59e0b;
+    }
+
+    .bar-progress {
+        background: #3b82f6;
+    }
+
+    .bar-resolved {
+        background: #059669;
+    }
+
+    .bar-closed {
+        background: #6b7280;
+    }
+
+    /* Ringkasan Aset */
+
+    .overview-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .overview-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 13px;
+        border: 1px solid #f0f0f0;
+        border-radius: 10px;
+    }
+
+    .overview-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        flex-shrink: 0;
+    }
+
+    .overview-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .overview-info p {
+        color: #6b7280;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .overview-info h4 {
+        color: #111827;
+        font-size: 19px;
+        font-weight: 700;
+    }
+
+    /* Tabel Aktivitas */
+
+    .table-wrapper {
+        width: 100%;
+        max-height: 500px;
+        overflow: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 9px;
+    }
+
+    .activity-table {
+        width: 100%;
+        min-width: 800px;
+        border-collapse: collapse;
+    }
+
+    .activity-table th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #f9fafb;
+        color: #4b5563;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: left;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+
+    .activity-table td {
+        padding: 14px 16px;
+        color: #4b5563;
+        font-size: 13px;
+        border-bottom: 1px solid #f1f1f1;
+        vertical-align: middle;
+    }
+
+    .activity-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .activity-table tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    .ticket-number {
+        color: #059669;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .ticket-subject {
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-open {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-assigned {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .status-progress {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-resolved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-closed {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 35px 20px;
+        color: #9ca3af;
+        font-size: 13px;
+    }
+
+    .empty-icon {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 1200px) {
+        .ticket-stats {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
+    }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f3f4f6;
-            color: #1f2937;
+    @media (max-width: 900px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
         }
+    }
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        button,
-        input {
-            font-family: inherit;
-        }
-
-        /* =========================
-           LAYOUT
-        ========================== */
-
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* =========================
-           SIDEBAR
-        ========================== */
-
-        .sidebar {
-            width: 250px;
-            background: #064e3b;
-            color: white;
-            padding: 24px 18px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 10;
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
+    @media (max-width: 650px) {
+        .ticket-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 12px;
-            padding: 0 8px 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
-            margin-bottom: 25px;
-        }
-
-        .sidebar-brand img {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-            background: white;
-            border-radius: 10px;
-            padding: 5px;
-        }
-
-        .sidebar-brand h1 {
-            margin: 0;
-            font-size: 17px;
-            line-height: 1.3;
-        }
-
-        .sidebar-brand p {
-            margin: 3px 0 0;
-            font-size: 11px;
-            color: #a7f3d0;
-        }
-
-        .menu-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #a7f3d0;
-            margin: 0 10px 10px;
-        }
-
-        .menu {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .menu a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 13px;
-            border-radius: 9px;
-            font-size: 14px;
-            color: #ecfdf5;
-            transition: 0.2s;
-        }
-
-        .menu a:hover {
-            background: rgba(255,255,255,0.10);
-        }
-
-        .menu a.active {
-            background: #059669;
-            color: white;
-            font-weight: 700;
-        }
-
-        .menu-icon {
-            width: 22px;
-            text-align: center;
-            font-size: 16px;
-        }
-
-        .sidebar-bottom {
-            margin-top: auto;
-        }
-
-        .logout-form {
-            margin-top: 20px;
-        }
-
-        .logout-btn {
-            width: 100%;
-            border: 1px solid rgba(255,255,255,0.18);
-            background: rgba(255,255,255,0.08);
-            color: white;
-            padding: 11px;
-            border-radius: 9px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255,255,255,0.15);
-        }
-
-        /* =========================
-           MAIN
-        ========================== */
-
-        .main {
-            margin-left: 250px;
-            width: calc(100% - 250px);
-            min-height: 100vh;
-        }
-
-        /* =========================
-           TOPBAR
-        ========================== */
-
-        .topbar {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 18px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .topbar-left h1 {
-            margin: 0;
-            font-size: 22px;
-            color: #064e3b;
-        }
-
-        .topbar-left p {
-            margin: 5px 0 0;
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .admin-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .admin-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #d1fae5;
-            color: #065f46;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-        .admin-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #374151;
-        }
-
-        .admin-role {
-            font-size: 11px;
-            color: #6b7280;
-            margin-top: 2px;
-        }
-
-        /* =========================
-           CONTENT
-        ========================== */
-
-        .content {
-            padding: 30px;
-        }
-
-        .welcome {
-            margin-bottom: 25px;
-        }
-
-        .welcome h2 {
-            margin: 0;
-            font-size: 28px;
-            color: #064e3b;
-        }
-
-        .welcome p {
-            margin-top: 7px;
-            font-size: 14px;
-            color: #6b7280;
-        }
-
-        /* =========================
-           STAT CARDS
-        ========================== */
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 25px;
         }
 
         .stat-card {
-            background: white;
-            border-radius: 14px;
-            padding: 22px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-            transition: 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-        }
-
-        .stat-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: #6b7280;
-            max-width: 75%;
-        }
-
-        .stat-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            background: #d1fae5;
-            color: #059669;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 19px;
+            padding: 15px;
         }
 
         .stat-number {
-            font-size: 32px;
-            font-weight: 700;
-            color: #111827;
+            font-size: 25px;
         }
-
-        .pending-number {
-            color: #d97706;
-        }
-
-        .stat-footer {
-            margin-top: 8px;
-            font-size: 11px;
-            color: #9ca3af;
-        }
-
-        /* =========================
-           SECTION CARD
-        ========================== */
 
         .section {
-            background: white;
-            border-radius: 14px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-            overflow: hidden;
+            padding: 16px;
         }
 
-        .section-header {
-            padding: 20px 22px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .welcome h2 {
+            font-size: 19px;
         }
+    }
 
-        .section-header h3 {
-            margin: 0;
-            font-size: 17px;
-            color: #111827;
+    @media (max-width: 380px) {
+        .ticket-stats {
+            grid-template-columns: 1fr;
         }
+    }
+</style>
 
-        .section-header span {
-            font-size: 12px;
-            color: #6b7280;
-        }
+@section('content')
 
-        /* =========================
-           TABLE
-        ========================== */
+<div class="dashboard-content">
 
-        .table-wrapper {
-            overflow-x: auto;
-        }
+    {{-- Sambutan Dashboard --}}
+    <div class="welcome">
+        <h2>Selamat Datang, Admin!</h2>
+        <p>
+            Pantau aktivitas tiket, aset, dan pemeliharaan
+            IT Helpdesk PT Gateway melalui halaman Dashboard.
+        </p>
+    </div>
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 850px;
-        }
+    {{-- Statistik Tiket --}}
+    <div class="ticket-stats">
 
-        th {
-            background: #ecfdf5;
-            color: #065f46;
-            padding: 13px 14px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">Total Tiket</span>
+                <div class="stat-icon icon-green">🎫</div>
+            </div>
+            <div class="stat-number">{{ $totalTickets }}</div>
+            <div class="stat-footer">Seluruh tiket terdaftar</div>
+        </div>
 
-        td {
-            padding: 14px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 13px;
-            color: #374151;
-            vertical-align: middle;
-        }
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">Tiket Terbuka</span>
+                <div class="stat-icon icon-orange">📩</div>
+            </div>
+            <div class="stat-number">{{ $openTickets }}</div>
+            <div class="stat-footer">Menunggu penanganan</div>
+        </div>
 
-        tbody tr:hover {
-            background: #f9fafb;
-        }
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">Sedang Diproses</span>
+                <div class="stat-icon icon-blue">⚙️</div>
+            </div>
+            <div class="stat-number">{{ $inProgressTickets }}</div>
+            <div class="stat-footer">Dalam penanganan IT Support</div>
+        </div>
 
-        .user-name {
-            font-weight: 700;
-            color: #111827;
-        }
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">Tiket Selesai</span>
+                <div class="stat-icon icon-green">✓</div>
+            </div>
+            <div class="stat-number">{{ $resolvedTickets }}</div>
+            <div class="stat-footer">Penanganan telah selesai</div>
+        </div>
 
-        .email {
-            color: #4b5563;
-        }
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-label">Tiket Ditutup</span>
+                <div class="stat-icon icon-gray">🔒</div>
+            </div>
+            <div class="stat-number">{{ $closedTickets }}</div>
+            <div class="stat-footer">Tiket telah ditutup</div>
+        </div>
 
-        .office,
-        .department {
-            color: #6b7280;
-        }
+    </div>
 
-        /* =========================
-           STATUS BADGE
-        ========================== */
+    {{-- Grafik dan Ringkasan --}}
+    <div class="dashboard-grid">
 
-        .status {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: #fef3c7;
-            color: #92400e;
-            font-size: 10px;
-            font-weight: 700;
-        }
+        {{-- Grafik Status Tiket --}}
+        <div class="section">
 
-        /* =========================
-           ACTION BUTTON
-        ========================== */
-
-        .action-buttons {
-            display: flex;
-            gap: 7px;
-        }
-
-        .btn {
-            border: none;
-            padding: 7px 11px;
-            border-radius: 7px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-approve {
-            background: #d1fae5;
-            color: #047857;
-        }
-
-        .btn-approve:hover {
-            background: #a7f3d0;
-        }
-
-        .btn-reject {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .btn-reject:hover {
-            background: #fecaca;
-        }
-
-        /* =========================
-           EMPTY STATE
-        ========================== */
-
-        .empty {
-            text-align: center;
-            padding: 55px 20px;
-            color: #6b7280;
-        }
-
-        .empty-icon {
-            width: 54px;
-            height: 54px;
-            margin: 0 auto 12px;
-            border-radius: 50%;
-            background: #d1fae5;
-            color: #059669;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .empty-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #374151;
-        }
-
-        .empty-text {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================== */
-
-        @media (max-width: 1000px) {
-
-            .sidebar {
-                width: 220px;
-            }
-
-            .main {
-                margin-left: 220px;
-                width: calc(100% - 220px);
-            }
-
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .content {
-                padding: 22px;
-            }
-
-            .topbar {
-                padding: 17px 22px;
-            }
-        }
-
-        @media (max-width: 700px) {
-
-            .layout {
-                display: block;
-            }
-
-            .sidebar {
-                position: relative;
-                width: 100%;
-                min-height: auto;
-                padding: 15px;
-            }
-
-            .sidebar-brand {
-                margin-bottom: 15px;
-                padding-bottom: 15px;
-            }
-
-            .menu {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .sidebar-bottom {
-                margin-top: 15px;
-            }
-
-            .main {
-                margin-left: 0;
-                width: 100%;
-            }
-
-            .topbar {
-                padding: 15px 18px;
-            }
-
-            .content {
-                padding: 18px;
-            }
-
-            .welcome h2 {
-                font-size: 23px;
-            }
-        }
-
-        @media (max-width: 480px) {
-
-            .menu {
-                grid-template-columns: 1fr;
-            }
-
-            .topbar {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .admin-info {
-                width: 100%;
-            }
-
-            .welcome h2 {
-                font-size: 21px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="layout">
-
-    <!-- =========================
-         SIDEBAR
-    ========================== -->
-
-    <aside class="sidebar">
-
-        <div>
-
-            <div class="sidebar-brand">
-
-                <img
-                    src="{{ asset('images/gateway-logo.webp') }}"
-                    alt="Gateway Logo"
-                >
-
+            <div class="section-header">
                 <div>
-                    <h1>IT Helpdesk</h1>
-                    <p>Gateway Admin</p>
+                    <h3>Ringkasan Status Tiket</h3>
+                    <p class="section-description">
+                        Perbandingan tiket berdasarkan status
+                    </p>
+                </div>
+            </div>
+
+            <div class="chart-list">
+
+                <div class="chart-item">
+                    <div class="chart-info">
+                        <span class="chart-name">Tiket Terbuka</span>
+                        <span class="chart-value">{{ $openTickets }}</span>
+                    </div>
+                    <div class="chart-track">
+                        <div class="chart-bar bar-open"
+                            @style(['width: ' . $openPercent . '%'])>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-item">
+                    <div class="chart-info">
+                        <span class="chart-name">Sedang Diproses</span>
+                        <span class="chart-value">{{ $inProgressTickets }}</span>
+                    </div>
+                    <div class="chart-track">
+                        <div class="chart-bar bar-progress"
+                            @style(['width: ' . $progressPercent . '%'])>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-item">
+                    <div class="chart-info">
+                        <span class="chart-name">Tiket Selesai</span>
+                        <span class="chart-value">{{ $resolvedTickets }}</span>
+                    </div>
+                    <div class="chart-track">
+                        <div class="chart-bar bar-resolved"
+                            @style(['width: ' . $resolvedPercent . '%'])>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-item">
+                    <div class="chart-info">
+                        <span class="chart-name">Tiket Ditutup</span>
+                        <span class="chart-value">{{ $closedTickets }}</span>
+                    </div>
+                    <div class="chart-track">
+                        <div class="chart-bar bar-closed"
+                            @style(['width: ' . $closedPercent . '%'])>
+                        </div>
+                    </div>
                 </div>
 
             </div>
+        </div>
 
-            <div class="menu-title">
-                Menu Utama
+        {{-- Ringkasan Aset dan Maintenance --}}
+        <div class="section">
+
+            <div class="section-header">
+                <div>
+                    <h3>Ringkasan Operasional</h3>
+                    <p class="section-description">
+                        Informasi aset dan pemeliharaan
+                    </p>
+                </div>
             </div>
 
-            <nav class="menu">
+            <div class="overview-list">
 
-                <a
-                    href="{{ route('admin.dashboard') }}"
-                    class="active"
-                >
-                    <span class="menu-icon">🏠</span>
-                    <span>Dashboard</span>
-                </a>
+                <div class="overview-item">
+                    <div class="overview-icon icon-green">💻</div>
+                    <div class="overview-info">
+                        <p>Total Aset Terdaftar</p>
+                        <h4>{{ number_format($totalAssets) }}</h4>
+                    </div>
+                </div>
 
-                <a href="#">
-                    <span class="menu-icon">👥</span>
-                    <span>User Management</span>
-                </a>
+                <div class="overview-item">
+                    <div class="overview-icon icon-blue">📅</div>
+                    <div class="overview-info">
+                        <p>Total Jadwal Maintenance</p>
+                        <h4>{{ number_format($totalMaintenanceSchedules) }}</h4>
+                    </div>
+                </div>
 
-                <a href="{{ route('admin.assets.index') }}">
-                    <span class="menu-icon">💻</span>
-                    <span>Asset Management</span>
-                </a>
+                <div class="overview-item">
+                    <div class="overview-icon icon-purple">🖥️</div>
+                    <div class="overview-info">
+                        <p>Total Data Maintenance Server</p>
+                        <h4>{{ number_format($totalServerMaintenance) }}</h4>
+                    </div>
+                </div>
 
-                <a href="{{ route('admin.maintenance.schedules.index') }}">
-                    <span class="menu-icon">🔧</span>
-                    <span>Maintenance</span>
-                </a>
+            </div>
+        </div>
 
-                <a href="#">
-                    <span class="menu-icon">📊</span>
-                    <span>Reports</span>
-                </a>
+    </div>
 
-            </nav>
+    {{-- Aktivitas Tiket Terbaru --}}
+    <div class="section">
+
+        <div class="section-header">
+            <div>
+                <h3>Aktivitas Tiket Terbaru</h3>
+                <p class="section-description">
+                    Daftar lima tiket terbaru yang masuk ke sistem
+                </p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+
+            <table class="activity-table">
+
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Nomor Tiket</th>
+                        <th>Subjek Tiket</th>
+                        <th>Kategori</th>
+                        <th>Status</th>
+                        <th>Tanggal Dibuat</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @forelse ($latestTickets as $index => $ticket)
+
+                        @php
+                            $statusLabels = [
+                                'open' => 'Terbuka',
+                                'assigned' => 'Ditugaskan',
+                                'in_progress' => 'Diproses',
+                                'resolved' => 'Selesai',
+                                'closed' => 'Ditutup',
+                            ];
+
+                            $statusClasses = [
+                                'open' => 'status-open',
+                                'assigned' => 'status-assigned',
+                                'in_progress' => 'status-progress',
+                                'resolved' => 'status-resolved',
+                                'closed' => 'status-closed',
+                            ];
+
+                            $ticketStatus = $ticket->status ?? 'open';
+                        @endphp
+
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+
+                            <td>
+                                <span class="ticket-number">
+                                    {{ $ticket->ticket_number ?? '-' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="ticket-subject">
+                                    {{ $ticket->subject ?? '-' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ $ticket->category->name ?? '-' }}
+                            </td>
+
+                            <td>
+                                <span class="status {{ $statusClasses[$ticketStatus] ?? 'status-closed' }}">
+                                    {{ $statusLabels[$ticketStatus] ?? ucfirst(str_replace('_', ' ', $ticketStatus)) }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ $ticket->created_at
+                                    ? $ticket->created_at->format('d/m/Y H:i')
+                                    : '-' }}
+                            </td>
+                        </tr>
+
+                    @empty
+
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty">
+                                    <div class="empty-icon">🎫</div>
+                                    Belum ada aktivitas tiket.
+                                </div>
+                            </td>
+                        </tr>
+
+                    @endforelse
+
+                </tbody>
+
+            </table>
 
         </div>
 
-        <div class="sidebar-bottom">
-
-            <div class="menu-title">
-                Akun
-            </div>
-
-            <form
-                action="{{ route('logout') }}"
-                method="POST"
-                class="logout-form"
-            >
-                @csrf
-
-                <button
-                    type="submit"
-                    class="logout-btn"
-                >
-                    🚪 Logout
-                </button>
-
-            </form>
-
-        </div>
-
-    </aside>
-
-
-    <!-- =========================
-         MAIN
-    ========================== -->
-
-    <main class="main">
-
-        <!-- TOPBAR -->
-
-        <header class="topbar">
-
-            <div class="topbar-left">
-
-                <h1>
-                    Dashboard Admin
-                </h1>
-
-                <p>
-                    IT Helpdesk Management System
-                </p>
-
-            </div>
-
-            <div class="admin-info">
-
-                <div class="admin-avatar">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-                </div>
-
-                <div>
-
-                    <div class="admin-name">
-                        {{ auth()->user()->name ?? 'Administrator' }}
-                    </div>
-
-                    <div class="admin-role">
-                        Administrator
-                    </div>
-
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- CONTENT -->
-
-        <section class="content">
-
-            <!-- WELCOME -->
-
-            <div class="welcome">
-
-                <h2>
-                    Selamat Datang, {{ auth()->user()->name ?? 'Administrator' }} 👋
-                </h2>
-
-                <p>
-                    Kelola pengguna, aset, maintenance, dan aktivitas IT Helpdesk Gateway.
-                </p>
-
-            </div>
-
-
-            <!-- =========================
-                 STATISTICS
-            ========================== -->
-
-            <div class="stats">
-
-                <!-- PENDING USER -->
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-
-                        <span class="stat-label">
-                            User Menunggu Persetujuan
-                        </span>
-
-                        <div class="stat-icon">
-                            👤
-                        </div>
-
-                    </div>
-
-                    <div class="stat-number pending-number">
-                        {{ $pendingUsers->count() }}
-                    </div>
-
-                    <div class="stat-footer">
-                        Membutuhkan tindakan admin
-                    </div>
-
-                </div>
-
-
-                <!-- TOTAL USER -->
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-
-                        <span class="stat-label">
-                            Total User
-                        </span>
-
-                        <div class="stat-icon">
-                            👥
-                        </div>
-
-                    </div>
-
-                    <div class="stat-number">
-                        {{ \App\Models\User::where('role_id', 1)->count() }}
-                    </div>
-
-                    <div class="stat-footer">
-                        Pengguna sistem
-                    </div>
-
-                </div>
-
-
-                <!-- ADMIN / IT SUPPORT -->
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-
-                        <span class="stat-label">
-                            Total Admin / IT Support
-                        </span>
-
-                        <div class="stat-icon">
-                            🛠️
-                        </div>
-
-                    </div>
-
-                    <div class="stat-number">
-                        {{ \App\Models\User::whereIn('role_id', [2, 3])->count() }}
-                    </div>
-
-                    <div class="stat-footer">
-                        Pengelola IT Helpdesk
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =========================
-                 USER APPROVAL
-            ========================== -->
-
-            <div class="section">
-
-                <div class="section-header">
-
-                    <div>
-
-                        <h3>
-                            User Menunggu Persetujuan
-                        </h3>
-
-                    </div>
-
-                    <span>
-                        {{ $pendingUsers->count() }} user pending
-                    </span>
-
-                </div>
-
-
-                @if ($pendingUsers->count() > 0)
-
-                    <div class="table-wrapper">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Nama
-                                    </th>
-
-                                    <th>
-                                        Email
-                                    </th>
-
-                                    <th>
-                                        Office
-                                    </th>
-
-                                    <th>
-                                        Department
-                                    </th>
-
-                                    <th>
-                                        Status
-                                    </th>
-
-                                    <th>
-                                        Action
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                                @foreach ($pendingUsers as $user)
-
-                                    <tr>
-
-                                        <td>
-
-                                            <span class="user-name">
-                                                {{ $user->name }}
-                                            </span>
-
-                                        </td>
-
-                                        <td>
-
-                                            <span class="email">
-                                                {{ $user->email }}
-                                            </span>
-
-                                        </td>
-
-                                        <td>
-
-                                            <span class="office">
-                                                {{ $user->office_id }}
-                                            </span>
-
-                                        </td>
-
-                                        <td>
-
-                                            <span class="department">
-                                                {{ $user->department_id }}
-                                            </span>
-
-                                        </td>
-
-                                        <td>
-
-                                            <span class="status">
-                                                Pending
-                                            </span>
-
-                                        </td>
-
-                                        <td>
-
-                                            <div class="action-buttons">
-
-                                                <!-- APPROVE -->
-
-                                                <form
-                                                    action="{{ route('admin.users.approve', $user->id) }}"
-                                                    method="POST"
-                                                >
-                                                    @csrf
-
-                                                    <button
-                                                        type="submit"
-                                                        class="btn btn-approve"
-                                                    >
-                                                        ✓ Approve
-                                                    </button>
-
-                                                </form>
-
-
-                                                <!-- REJECT -->
-
-                                                <form
-                                                    action="{{ route('admin.users.reject', $user->id) }}"
-                                                    method="POST"
-                                                >
-                                                    @csrf
-
-                                                    <button
-                                                        type="submit"
-                                                        class="btn btn-reject"
-                                                    >
-                                                        ✕ Reject
-                                                    </button>
-
-                                                </form>
-
-                                            </div>
-
-                                        </td>
-
-                                    </tr>
-
-                                @endforeach
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                @else
-
-                    <div class="empty">
-
-                        <div class="empty-icon">
-                            ✓
-                        </div>
-
-                        <div class="empty-title">
-                            Semua user sudah diproses
-                        </div>
-
-                        <div class="empty-text">
-                            Tidak ada user yang menunggu persetujuan saat ini.
-                        </div>
-
-                    </div>
-
-                @endif
-
-            </div>
-
-        </section>
-
-    </main>
+    </div>
 
 </div>
 
-</body>
-</html>
+@endsection

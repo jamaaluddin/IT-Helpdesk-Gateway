@@ -267,9 +267,93 @@
         }
 
         textarea {
-            min-height: 145px;
-            resize: vertical;
+            min-height: 55px;
+            height: 55px;
+            max-height: 300px;
+            resize: none;
+            overflow-y: hidden;
             line-height: 1.6;
+        }
+
+        /* =========================
+           ASSET SELECTOR
+        ========================= */
+
+        .asset-selector {
+            position: relative;
+        }
+
+        .asset-search {
+            cursor: text;
+        }
+
+        .asset-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .asset-dropdown.show {
+            display: block;
+        }
+
+        .asset-options {
+            max-height: 190px;
+            overflow-y: auto;
+        }
+
+        .asset-option {
+            padding: 12px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s ease;
+        }
+
+        .asset-option:hover {
+            background: #eff6ff;
+        }
+
+        .asset-option:last-child {
+            border-bottom: none;
+        }
+
+        .asset-option strong {
+            display: block;
+            font-size: 13px;
+            color: #1f2937;
+        }
+
+        .asset-option span {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .asset-empty {
+            padding: 14px;
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .asset-clear {
+            display: none;
+            margin-top: 7px;
+            padding: 0;
+            border: none;
+            background: none;
+            color: #dc2626;
+            font-size: 12px;
+            cursor: pointer;
         }
 
         /* =========================
@@ -668,6 +752,92 @@
 
                 <div class="help-text">
                     Pilih kategori yang paling sesuai dengan masalah yang Anda alami.
+                </div>
+
+            </div>
+
+
+            <!-- PILIH KOMPUTER -->
+
+            <div class="form-group">
+
+                <label>
+                    Pilih Komputer
+                </label>
+
+                <div class="asset-selector">
+
+                    <input
+                        type="text"
+                        id="assetSearch"
+                        class="asset-search"
+                        placeholder="Cari kode atau nama komputer..."
+                        autocomplete="off"
+                        value="{{ old('asset_id') ? optional($computers->firstWhere('id', old('asset_id')))->asset_code : '' }}"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="asset_id"
+                        id="assetId"
+                        value="{{ old('asset_id') }}"
+                    >
+
+                    <div class="asset-dropdown" id="assetDropdown">
+
+                        <div class="asset-options" id="assetOptions">
+
+                            @forelse ($computers as $computer)
+
+                                <div
+                                    class="asset-option"
+                                    data-id="{{ $computer->id }}"
+                                    data-code="{{ strtolower($computer->asset_code) }}"
+                                    data-name="{{ strtolower($computer->name) }}"
+                                >
+
+                                    <strong>
+                                        {{ $computer->asset_code }}
+                                    </strong>
+
+                                    <span>
+                                        {{ $computer->name }}
+                                    </span>
+
+                                </div>
+
+                            @empty
+
+                                <div class="asset-empty">
+                                    Belum ada data komputer tersedia.
+                                </div>
+
+                            @endforelse
+
+                        </div>
+
+                        <div
+                            class="asset-empty"
+                            id="assetNoResult"
+                            style="display: none;"
+                        >
+                            Komputer tidak ditemukan.
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="asset-clear"
+                        id="assetClear"
+                    >
+                        Hapus pilihan komputer
+                    </button>
+
+                </div>
+
+                <div class="help-text">
+                    Opsional. Pilih komputer yang mengalami masalah atau kosongkan jika tidak berkaitan dengan komputer tertentu.
                 </div>
 
             </div>
@@ -1084,6 +1254,154 @@
     checkCategory();
 
     checkHandlingMethod();
+
+
+    /* =========================
+       ASSET SEARCH DROPDOWN
+    ========================= */
+
+    const assetSearch = document.getElementById('assetSearch');
+    const assetId = document.getElementById('assetId');
+    const assetDropdown = document.getElementById('assetDropdown');
+    const assetNoResult = document.getElementById('assetNoResult');
+    const assetClear = document.getElementById('assetClear');
+
+    const assetItems = Array.from(
+        document.querySelectorAll('.asset-option')
+    );
+
+    function filterAssets() {
+
+        // Jika komputer sudah dipilih, tampilkan semua pilihan saat input difokuskan.
+        const keyword = assetId.value
+            ? ''
+            : assetSearch.value.trim().toLowerCase();
+
+        let found = 0;
+
+        assetItems.forEach((item) => {
+
+            const code = item.dataset.code;
+            const name = item.dataset.name;
+
+            const match =
+                code.includes(keyword) ||
+                name.includes(keyword);
+
+            item.style.display = match ? 'block' : 'none';
+
+            if (match) {
+                found++;
+            }
+
+        });
+
+        assetNoResult.style.display =
+            found === 0 ? 'block' : 'none';
+    }
+
+    function showAssetDropdown() {
+        assetDropdown.classList.add('show');
+        filterAssets();
+    }
+
+    function selectAsset(item) {
+
+        assetId.value = item.dataset.id;
+
+        const code = item.querySelector('strong').textContent.trim();
+        const name = item.querySelector('span').textContent.trim();
+
+        assetSearch.value = code + ' - ' + name;
+
+        assetDropdown.classList.remove('show');
+        assetClear.style.display = 'inline-block';
+    }
+
+    assetSearch.addEventListener('focus', showAssetDropdown);
+
+    assetSearch.addEventListener('input', function () {
+
+        // Saat user mulai mengetik ulang, pilihan sebelumnya dibatalkan.
+        assetId.value = '';
+        assetClear.style.display = 'none';
+
+        showAssetDropdown();
+
+    });
+
+    assetItems.forEach((item) => {
+
+        item.addEventListener('click', function () {
+            selectAsset(item);
+        });
+
+    });
+
+    assetClear.addEventListener('click', function () {
+
+        assetSearch.value = '';
+        assetId.value = '';
+        assetClear.style.display = 'none';
+
+        assetSearch.focus();
+        showAssetDropdown();
+
+    });
+
+    document.addEventListener('click', function (event) {
+
+        if (!event.target.closest('.asset-selector')) {
+            assetDropdown.classList.remove('show');
+        }
+
+    });
+
+
+    /* =========================
+       RESTORE OLD ASSET
+    ========================= */
+
+    if (assetId.value) {
+
+        const selectedItem = assetItems.find(
+            item => item.dataset.id === assetId.value
+        );
+
+        if (selectedItem) {
+            selectAsset(selectedItem);
+        } else {
+            assetId.value = '';
+            assetSearch.value = '';
+        }
+
+    }
+
+
+    /* =========================
+       AUTO RESIZE TEXTAREA
+    ========================= */
+
+    document.querySelectorAll('textarea').forEach((textarea) => {
+
+        function autoResize() {
+
+            textarea.style.height = '55px';
+
+            const newHeight = Math.min(textarea.scrollHeight, 300);
+
+            textarea.style.height = newHeight + 'px';
+
+            textarea.style.overflowY =
+                textarea.scrollHeight > 300 ? 'auto' : 'hidden';
+        }
+
+        textarea.addEventListener('input', autoResize);
+
+        // Menyesuaikan teks lama setelah validasi gagal
+        autoResize();
+
+    });
 
 </script>
 

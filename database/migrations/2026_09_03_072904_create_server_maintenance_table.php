@@ -12,25 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('server_maintenance', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->foreignId('office_id')
-        ->constrained('offices');
+            $table->foreignId('office_id')
+                ->constrained('offices');
 
-    $table->foreignId('performed_by')
-        ->constrained('users');
+            $table->foreignId('performed_by')
+                ->constrained('users');
 
-    $table->string('ip_address')->nullable();
-    $table->string('security')->nullable();
-    $table->string('bandwidth')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->string('security')->nullable();
+            $table->string('bandwidth')->nullable();
 
-    $table->date('maintenance_date');
+            $table->date('maintenance_date');
 
-    $table->text('result')->nullable();
-    $table->text('remarks')->nullable();
+            $table->text('result')->nullable();
+            $table->text('remarks')->nullable();
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

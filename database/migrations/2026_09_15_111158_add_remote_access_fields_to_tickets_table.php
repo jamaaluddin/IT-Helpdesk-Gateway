@@ -12,9 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->string('remote_application')->nullable()->after('handling_method');
-            $table->string('remote_address')->nullable()->after('remote_application');
-            $table->string('remote_password')->nullable()->after('remote_address');
+            $table->string('remote_application')
+                ->nullable()
+                ->after('handling_method');
+
+            $table->string('remote_address')
+                ->nullable()
+                ->after('remote_application');
+
+            $table->string('remote_password')
+                ->nullable()
+                ->after('remote_address');
         });
     }
 

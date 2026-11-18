@@ -388,6 +388,90 @@
             font-size: 14px;
         }
 
+        /* =====================================================
+           FILTER TIKET
+        ===================================================== */
+
+        .ticket-filter-wrapper {
+            margin-top: 16px;
+        }
+
+        .ticket-filters {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: #f5f3ff;
+            color: #7c3aed;
+            border-color: #ddd6fe;
+        }
+
+        .filter-btn.active {
+            background: #7c3aed;
+            color: white;
+            border-color: #7c3aed;
+            box-shadow: 0 3px 8px rgba(124, 58, 237, 0.16);
+        }
+
+        /* NAVIGASI BULAN */
+
+        .month-navigation {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 13px;
+        }
+
+        .month-label {
+            color: #172033;
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 125px;
+            text-align: center;
+        }
+
+        .month-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 29px;
+            height: 29px;
+            border-radius: 7px;
+            border: 1px solid #ddd6fe;
+            background: #f5f3ff;
+            color: #7c3aed;
+            text-decoration: none;
+            font-size: 11px;
+            transition: 0.2s ease;
+        }
+
+        .month-arrow:hover {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .month-arrow.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
 
 
         /* =====================================================
@@ -438,6 +522,25 @@
                 0 12px 22px rgba(124, 58, 237, 0.09);
         }
 
+        .print-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            background: #7c3aed;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px solid #7c3aed;
+            transition: 0.2s ease;
+        }
+
+        .print-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
 
 
         /* =====================================================
@@ -935,6 +1038,8 @@
 
             <!-- DASHBOARD -->
 
+            <div class="menu-title">Menu Utama</div>
+
             <a href="{{ route('it-support.dashboard') }}">
 
                 <span class="menu-icon">🏠</span>
@@ -1016,7 +1121,7 @@
             </div>
 
 
-            <a href="#">
+            <a href="{{ route('it-support.assets.index') }}">
 
                 <span class="menu-icon">💻</span>
 
@@ -1131,47 +1236,123 @@
         <main class="container">
 
 
-            <!-- TOP -->
+         <!-- TOP -->
 
-            <div class="top">
+<div class="top">
+
+    <div>
+
+        <div class="top-title-row">
+
+            <h2>📜 Riwayat Tiket</h2>
+
+            <span class="total">
+                Total: {{ $tickets->count() }} tiket
+            </span>
+
+        </div>
+
+        <p>
+            Daftar tiket yang telah selesai ditangani oleh IT Support.
+        </p>
 
 
-                <div>
+        <!-- FILTER PERIODE -->
 
-                    <div class="top-title-row">
+        <div class="ticket-filter-wrapper">
 
-                        <h2>
-
-                            📜 Riwayat Tiket
-                        </h2>
-
-                        <span class="total">
-
-                            Total: {{ $tickets->count() }} tiket
-                        </span>
-
-                    </div>
-
-                    <p>
-
-                        Daftar tiket yang telah selesai ditangani oleh IT Support.
-
-                    </p>
-
-                </div>
+            <div class="ticket-filters">
 
                 <a
-                    href="{{ route('it-support.dashboard') }}"
-                    class="back-btn"
+                    href="{{ route('it-support.tickets.history', ['period' => 'today']) }}"
+                    class="filter-btn {{ $period === 'today' ? 'active' : '' }}"
                 >
-
-                    ← Dashboard
-
+                    Hari Ini
                 </a>
 
+                <a
+                    href="{{ route('it-support.tickets.history', ['period' => 'this_week']) }}"
+                    class="filter-btn {{ $period === 'this_week' ? 'active' : '' }}"
+                >
+                    Minggu Ini
+                </a>
+
+                <a
+                    href="{{ route('it-support.tickets.history', [
+                        'period' => 'month',
+                        'month' => $monthValue
+                    ]) }}"
+                    class="filter-btn {{ $period === 'month' ? 'active' : '' }}"
+                >
+                    Bulanan
+                </a>
 
             </div>
 
+
+            @if ($period === 'month')
+
+                <div class="month-navigation">
+
+                    <a
+                        href="{{ route('it-support.tickets.history', [
+                            'period' => 'month',
+                            'month' => $previousMonth
+                        ]) }}"
+                        class="month-arrow"
+                    >
+                        &#10094;
+                    </a>
+
+                    <span class="month-label">
+                        {{ $monthLabel }}
+                    </span>
+
+                    @if ($canGoNextMonth)
+
+                        <a
+                            href="{{ route('it-support.tickets.history', [
+                                'period' => 'month',
+                                'month' => $nextMonth
+                            ]) }}"
+                            class="month-arrow"
+                        >
+                            &#10095;
+                        </a>
+
+                    @else
+
+                        <span class="month-arrow disabled">
+                            &#10095;
+                        </span>
+
+                    @endif
+
+                </div>
+
+            @endif
+
+        </div>
+
+    </div>
+
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+
+        <a href="#" class="print-btn">
+            🖨 Cetak Laporan
+        </a>
+
+        <a
+            href="{{ route('it-support.dashboard') }}"
+            class="back-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+</div>
 
 
             <!-- =================================================

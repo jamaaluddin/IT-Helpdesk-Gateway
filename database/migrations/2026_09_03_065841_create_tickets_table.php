@@ -11,42 +11,48 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('tickets', function (Blueprint $table) {
-    $table->id();
+        Schema::create('tickets', function (Blueprint $table) {
+            $table->id();
 
-    $table->string('ticket_number')->unique();
+            $table->string('ticket_number')->unique();
 
-    $table->foreignId('user_id')->constrained('users');
-    $table->foreignId('office_id')->constrained('offices');
-    $table->foreignId('department_id')->constrained('departments');
-    $table->foreignId('category_id')->constrained('ticket_categories');
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('office_id')->constrained('offices');
+            $table->foreignId('department_id')->constrained('departments');
+            $table->foreignId('category_id')->constrained('ticket_categories');
 
-    $table->string('subject');
-    $table->text('description');
+            $table->string('subject');
+            $table->text('description');
 
-    $table->enum('priority', ['low', 'medium', 'high', 'critical'])
-        ->default('medium');
+            // Catatan penyelesaian tiket oleh IT Support
+            $table->text('resolution_notes')->nullable();
 
-    $table->enum('status', [
-        'open',
-        'assigned',
-        'in_progress',
-        'waiting',
-        'resolved',
-        'closed'
-    ])->default('open');
+            // Lokasi file bukti penyelesaian tiket
+            $table->string('evidence')->nullable();
 
-    $table->foreignId('assigned_to')
-        ->nullable()
-        ->constrained('users')
-        ->nullOnDelete();
+            $table->enum('priority', ['low', 'medium', 'high', 'critical'])
+                ->default('medium');
 
-    $table->timestamp('assigned_at')->nullable();
-    $table->timestamp('resolved_at')->nullable();
-    $table->timestamp('closed_at')->nullable();
+            $table->enum('status', [
+                'open',
+                'assigned',
+                'in_progress',
+                'waiting',
+                'resolved',
+                'closed',
+            ])->default('open');
 
-    $table->timestamps();
-});
+            $table->foreignId('assigned_to')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            $table->timestamp('assigned_at')->nullable();
+            $table->timestamp('resolved_at')->nullable();
+            $table->timestamp('closed_at')->nullable();
+
+            $table->timestamps();
+        });
     }
 
     /**

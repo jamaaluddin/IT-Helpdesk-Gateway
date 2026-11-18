@@ -16,7 +16,7 @@ return new class extends Migration
                 'low',
                 'medium',
                 'high',
-                'critical'
+                'critical',
             ])->nullable()->change();
         });
     }
@@ -31,7 +31,7 @@ return new class extends Migration
                 'low',
                 'medium',
                 'high',
-                'critical'
+                'critical',
             ])->default('medium')->change();
         });
     }

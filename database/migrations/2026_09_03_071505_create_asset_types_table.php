@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('asset_types', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->string('name');
-    $table->text('description')->nullable();
-    $table->boolean('is_active')->default(true);
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

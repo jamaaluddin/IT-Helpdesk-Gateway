@@ -12,34 +12,34 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('maintenance_records', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->foreignId('maintenance_schedule_id')
-        ->constrained('maintenance_schedules')
-        ->cascadeOnDelete();
+            $table->foreignId('maintenance_schedule_id')
+                ->constrained('maintenance_schedules')
+                ->cascadeOnDelete();
 
-    $table->foreignId('asset_id')
-        ->constrained('assets');
+            $table->foreignId('asset_id')
+                ->constrained('assets');
 
-    $table->foreignId('performed_by')
-        ->constrained('users');
+            $table->foreignId('performed_by')
+                ->constrained('users');
 
-    $table->text('analysis')->nullable();
-    $table->text('action');
-    $table->text('result')->nullable();
-    $table->text('remarks')->nullable();
+            $table->text('analysis')->nullable();
+            $table->text('action');
+            $table->text('result')->nullable();
+            $table->text('remarks')->nullable();
 
-    $table->enum('condition_after', [
-        'good',
-        'minor_damage',
-        'major_damage',
-        'broken'
-    ])->nullable();
+            $table->enum('condition_after', [
+                'good',
+                'minor_damage',
+                'major_damage',
+                'broken',
+            ])->nullable();
 
-    $table->timestamp('performed_at');
+            $table->timestamp('performed_at');
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

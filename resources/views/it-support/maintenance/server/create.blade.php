@@ -463,6 +463,8 @@
 
     <nav class="menu">
 
+       <div class="menu-title">Menu Utama</div>
+
         <a href="{{ route('it-support.dashboard') }}">
             <span class="menu-icon">🏠</span>
             <span>Dashboard</span>
@@ -517,7 +519,7 @@
         </div>
 
 
-        <a href="#">
+        <a href="{{ route('it-support.assets.index') }}">
             <span class="menu-icon">💻</span>
             <span>Aset Gateway</span>
         </a>
