@@ -15,6 +15,7 @@ use App\Http\Controllers\MaintenanceHistoryController;
 use App\Http\Controllers\ServerMaintenanceController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\ITSupportAssetController;
+use App\Http\Controllers\BeritaAcaraController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -218,6 +219,35 @@ Route::post('/it-support/tickets/{ticket}/priority', [ITSupportController::class
 Route::post('/it-support/tickets/{ticket}/resolve', [ITSupportController::class, 'resolve'])
     ->middleware(['auth', 'role:IT Support'])
     ->name('it-support.tickets.resolve');
+
+Route::get('/it-support/berita-acara', [BeritaAcaraController::class, 'index'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.berita-acara.index');
+
+Route::get('/it-support/berita-acara/create', [BeritaAcaraController::class, 'create'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.berita-acara.create');
+
+Route::post('/it-support/berita-acara', [BeritaAcaraController::class, 'store'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.berita-acara.store');
+
+Route::get('/it-support/berita-acara/{beritaAcara}/edit', [BeritaAcaraController::class, 'edit'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.berita-acara.edit');
+
+Route::put('/it-support/berita-acara/{beritaAcara}', [BeritaAcaraController::class, 'update'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.berita-acara.update');
+
+Route::delete('/it-support/berita-acara/{beritaAcara}', [BeritaAcaraController::class, 'destroy'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.berita-acara.destroy');
+
+Route::get('/it-support/berita-acara/{beritaAcara}', [BeritaAcaraController::class, 'show'])
+    ->middleware(['auth', 'role:IT Support'])
+    ->name('it-support.berita-acara.show');
+
 
 // User Routes
 

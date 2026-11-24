@@ -59,6 +59,9 @@
             z-index: 1001;
             overflow-y: auto;
             transition: transform 0.3s ease;
+
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-brand {
@@ -132,7 +135,7 @@
         }
 
         .sidebar-logout {
-            margin-top: 28px;
+            margin-top: auto;
             padding-bottom: 10px;
         }
 
@@ -524,9 +527,11 @@
                     <span>Aset Gateway</span>
                 </a>
 
-               <div class="menu-title">Dokumen</div>
+                <div class="menu-title">Dokumen</div>
 
-                <a href="#">
+                <a href="{{ route('it-support.berita-acara.index') }}"
+                    class="{{ request()->routeIs('it-support.berita-acara.*') ? 'active' : '' }}"
+                >
                     <span class="menu-icon">📄</span>
                     <span>Berita Acara</span>
                 </a>
