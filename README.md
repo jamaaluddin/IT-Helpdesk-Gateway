@@ -63,8 +63,8 @@ Fitur utama:
 
 Metode penanganan yang tersedia:
 
-- Remote Offline
-- Remote By Sistem
+- Offline
+- Remote / Sistem
 
 ---
 
@@ -83,7 +83,6 @@ Fitur utama:
 - Melihat laporan Internet/Server Maintenance
 - Monitoring aktivitas IT
 
----
 
 ## 🎫 Sistem Ticketing
 
@@ -103,3 +102,27 @@ Informasi tiket meliputi:
 - Waktu penanganan
 - Waktu penyelesaian
 
+
+## 🛠️ Technology Stack
+
+### Backend
+- PHP 8.4.0
+- Laravel 13.30.1
+- Composer 2.10.3
+
+### Frontend
+- HTML
+- CSS
+- JavaScript
+- Tailwind CSS 4.3.3
+- Vite 8.3.5
+- Laravel Vite Plugin 3.2.0
+
+### Database
+- MariaDB 10.4.32
+
+### Development Tools
+- Node.js 24.12.0
+- npm 11.6.2
+- Git 2.52.0
+- GitHub

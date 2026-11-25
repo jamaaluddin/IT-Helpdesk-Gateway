@@ -1105,6 +1105,9 @@
     const otherProblem =
         document.getElementById('otherProblem');
 
+    const otherProblemInput =
+    otherProblem.querySelector('textarea');
+
     const handlingMethodGroup =
         document.getElementById('handlingMethodGroup');
 
@@ -1158,10 +1161,12 @@
         if (isOtherCategory) {
 
             otherProblem.style.display = 'block';
+            otherProblemInput.required = true;
 
         } else {
 
             otherProblem.style.display = 'none';
+            otherProblemInput.required = false;
 
         }
 

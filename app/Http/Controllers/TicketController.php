@@ -70,6 +70,7 @@ class TicketController extends Controller
                 }),
             ],
             'description' => 'required|string',
+            'other_problem' => 'nullable|string|max:2000',
             'problem_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
 
             'handling_method' => 'nullable|in:in_person,remote',
@@ -89,6 +90,24 @@ class TicketController extends Controller
             strtolower($category->name),
             'lainnya'
         );
+
+        // Validasi penjelasan kategori Lainnya
+        if ($isOtherCategory) {
+            $request->validate([
+                'other_problem' => 'required|string|max:2000',
+            ]);
+        }
+
+        // Gabungkan penjelasan Lainnya dengan deskripsi utama
+        $descriptionForTicket = $request->description;
+
+        if ($isOtherCategory) {
+            $descriptionForTicket =
+                "Masalah lainnya:\n" .
+                trim($request->other_problem) .
+                "\n\nDeskripsi masalah:\n" .
+                trim($request->description);
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -151,7 +170,8 @@ class TicketController extends Controller
         $ticket = DB::transaction(function () use (
             $request,
             $problemImagePath,
-            $isOtherCategory
+            $isOtherCategory,
+            $descriptionForTicket
             )
         {
             $today = now()->toDateString();
@@ -242,7 +262,7 @@ class TicketController extends Controller
             'category_id' => $request->category_id,
             'asset_id' => $request->asset_id,
             'subject' => $request->subject,
-            'description' => $request->description,
+            'description' => $descriptionForTicket,
             'problem_image' => $problemImagePath,
 
             'priority' => null,
